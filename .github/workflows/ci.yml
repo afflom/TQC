@@ -86,8 +86,9 @@ jobs:
         # framework crates are what we pin.
         run: cargo check -p tqc-core -p tqc-model -p tqc-atlas --all-features
 
-  # The substrate facade (excluded from the core workspace): resolves + builds the real
-  # holospaces / hologram / uor-addr graph and exercises content-addressing.
+  # Focused integration check that the substrate facade resolves, builds, and tests at the
+  # pinned revs (holospaces f2415624…, uor-addr 0.2.0). The `gate` job also builds this graph
+  # transitively (tqc-vv depends on tqc-substrate); this job isolates the substrate surface.
   substrate:
     runs-on: ubuntu-latest
     steps:

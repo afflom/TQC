@@ -8,7 +8,7 @@
     "namespace": "UOR.Bridge.F1Square.Square",
     "license": "MIT",
     "retrieved": "2026-06-26",
-    "extraction": "Each value below is a stable, decide-proved Atlas invariant in F1 (an invariant of the formalization, present across releases). Pinned to the immutable release tag v0.21.0. Authoritatively re-derive with the lake build + Extract.lean CI job; this committed snapshot is the fast-path oracle. F1's own scripts/honesty_audit.sh guarantees the theorems are sorry-free with axioms only {propext, Quot.sound}."
+    "extraction": "Each value below is a stable, decide-proved Atlas invariant in F1 (an invariant of the formalization, present across releases). Pinned to the immutable release tag v0.21.0. Regenerate via the manual procedure in oracles/PROVENANCE.md; this committed snapshot is the oracle, verified by sha256 (oracle-verify) and pin (atlas-pin-check). F1's own scripts/honesty_audit.sh guarantees the theorems are sorry-free with axioms only {propext, Quot.sound}."
   },
   "params": { "scope_q": 4, "modality_T": 3, "context_O": 8 },
   "classes": {

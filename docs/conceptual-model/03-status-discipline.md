@@ -10,9 +10,8 @@ meta-gate enforces it mechanically.
 | `build` | A precisely-scoped construction on sourced pieces, validated against universal axioms. | That the construction satisfies the **MTC axioms** (hexagon, Yang–Baxter, SL(2,ℤ), Verlinde, …) — never that it is *the* unique object. | gating `suite` |
 | `open` | A genuine unknown (universality, advantage). | Only *measurements*. The claim itself is reported, never asserted true. | non-gating `target` |
 
-There is no crux. The TQC inner product is the positive-definite Euclidean composition norm
-`Σxᵢ²` (a manifest sum of squares); nothing in the construction references a signed prime
-form, so F1's `none` (RH) level has no role here.
+The TQC inner product is the positive-definite Euclidean composition norm `Σxᵢ²` — a manifest
+sum of squares — so "generators are unitary" is genuine orthogonality, established directly.
 
 ## The inner product
 

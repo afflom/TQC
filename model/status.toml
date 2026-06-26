@@ -2,9 +2,8 @@
 # A status is a CONTRACT on what the V&V suite may assert about a row.
 # Parsed by `tqc-model`; enforced by the honesty meta-gate in `tqc-conformance`.
 #
-# The vocabulary is `some-true` / `build` / `open`. There is no crux: the TQC inner product
-# is the positive-definite Euclidean composition norm, and nothing references a signed prime
-# form, so F1's `none` (RH) level has no role here.
+# The vocabulary is `some-true` / `build` / `open`. The TQC inner product is the
+# positive-definite Euclidean composition norm; unitarity is genuine orthogonality.
 
 [[level]]
 id = "some-true"
@@ -14,7 +13,7 @@ gating = true
 
 [[level]]
 id = "build"
-summary = "A precisely-scoped construction on sourced pieces; crux-independent; not yet asserted complete."
+summary = "A precisely-scoped construction on sourced pieces, validated against the universal MTC axioms."
 may_assert = "axioms-only"    # validated against universal axioms / sourced reductions only
 gating = true
 

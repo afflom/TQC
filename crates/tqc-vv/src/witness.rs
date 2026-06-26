@@ -101,7 +101,7 @@ pub fn label_space_belt(p: &UseCaseParams, f1: &F1Constants) -> Witness {
 
 /// VV — the inner product is the definite Euclidean companion `Σxᵢ²`.
 ///
-/// Validates definiteness (not merely PSD), keeping it distinct from the signed prime form.
+/// Validates definiteness: a positive-definite sum of squares.
 ///
 /// # Errors
 /// If the form is not a definite sum of squares.

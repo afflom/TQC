@@ -148,8 +148,8 @@ oracle = "holospaces-cc"
 tier = "suite"
 feature = "features/suites/s3_measurement/ground_space_protection.feature"
 
-# --- The 'build' rows: scoped constructions on sourced pieces, validated against MTC
-#     axioms only. Never asserted sound; crux-independent. ---
+# --- The 'build' rows: scoped constructions on sourced pieces, validated against the
+#     universal MTC axioms only. Never asserted sound. ---
 
 [[row]]
 id = "braiding-r-matrix"

@@ -2,8 +2,8 @@
 //!
 //! Realizes the `reflection-generators` dictionary row. Because each generator is a
 //! permutation of the label space, it is automatically orthogonal w.r.t. the Euclidean inner
-//! product `Σxᵢ²` (see [`crate::inner`]) — this is "the unlock": unitarity with **no**
-//! positivity assumption, hence independent of the crux.
+//! product `Σxᵢ²` (see [`crate::inner`]): unitarity with **no** positivity assumption,
+//! established directly.
 
 use crate::params::UseCaseParams;
 use alloc::vec::Vec;

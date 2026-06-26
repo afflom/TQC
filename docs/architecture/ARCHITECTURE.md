@@ -101,7 +101,7 @@ Each dictionary row carries one of three levels (see
   sound; an `open` row may be *probed and reported* but never asserted true.
 - **Euclidean inner product** — the inner product is the positive-definite Euclidean
   composition norm `Σxᵢ²`, so "generators are unitary" is genuine orthogonality, established
-  directly. There is no crux.
+  directly.
 
 This mirrors F1's own `scripts/honesty_audit.sh`, promoted from a script to a typed,
 test-enforced invariant.

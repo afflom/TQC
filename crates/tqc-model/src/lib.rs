@@ -4,7 +4,7 @@
 //! here at compile time. [`Model::load`] parses it and enforces the structural invariants the
 //! honesty meta-gate relies on: every dictionary row names a known status and oracle, names a
 //! feature, and status discipline holds (an `open` row can never be a gating `suite`). The
-//! vocabulary is `some-true` / `build` / `open` — there is no crux.
+//! vocabulary is `some-true` / `build` / `open`.
 //!
 //! This crate contains **no mathematics and no substrate** — only the model.
 //!
