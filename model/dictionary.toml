@@ -39,7 +39,7 @@ feature = "features/suites/s0_labels/label_space_belt.feature"
 [[row]]
 id = "inner-product"
 tqc = "Inner product (unitarity)"
-atlas = "Euclidean definite companion <x,x>=sum x_i^2 on the 24-dim V_T (+) V_O"
+atlas = "Euclidean definite companion <x,x>=sum x_i^2 on the 24-dim V_T (x) V_O"
 source = "AtlasSpectrum WeilPSD_rankOne; AtlasCharacteristics 5"
 status = "some-true"
 stage = "S1"

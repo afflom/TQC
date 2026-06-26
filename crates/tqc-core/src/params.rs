@@ -85,7 +85,7 @@ impl UseCaseParams {
         self.modality as u64 * self.context as u64
     }
 
-    /// Carrier dimension `V_T ⊕ V_O`: `modality · context`.
+    /// Carrier dimension `V_T ⊗ V_O`: `modality · context`.
     #[must_use]
     pub const fn carrier_dim(&self) -> u64 {
         self.stride()

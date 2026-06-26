@@ -26,7 +26,7 @@ never asserted true.
 
 ## Unitarity from orthogonality
 
-The Atlas carries, on the 24-dim space `V_T ⊕ V_O` `(T,O)=(3,8)`, two distinct quadratic
+The Atlas carries, on the 24-dim space `V_T ⊗ V_O` `(T,O)=(3,8)`, two distinct quadratic
 forms that the construction keeps separate:
 
 - the **balanced spectral operator** `M = (O+2)·I − T·Π_T − O·Π_O` — signature `(10,14)`,
@@ -50,7 +50,7 @@ with no further assumption.
 |---|---|---|---|
 | Objects (anyon labels) | byte ↔ (scope `q=2^{O−2T}=4`, modality `T=3`, context `O=8`); `96` classes, stride `T·O=24` | `AtlasClasses` §2 `classIndex`, `class_count_stride`, `classIndex_range` | some-true |
 | Label / state-space index | the `12288 = 48×256 = 96×128` belt; `A_∞` inverse-limit address | `AtlasClasses` `belt_extent`; `AtlasAddressing` `atlas_parametric_generation` | some-true |
-| Inner product (unitarity) | Euclidean definite companion `⟨x,x⟩=Σxᵢ²` on the 24-dim `V_T ⊕ V_O` | `AtlasSpectrum` `WeilPSD_rankOne`; `AtlasCharacteristics` §5 | some-true |
+| Inner product (unitarity) | Euclidean definite companion `⟨x,x⟩=Σxᵢ²` on the 24-dim `V_T ⊗ V_O` | `AtlasSpectrum` `WeilPSD_rankOne`; `AtlasCharacteristics` §5 | some-true |
 | Fusion `⊗` (commutative) | `compose_g2_product` → CS-G2 commutative binary product: orders the operand digests lex-min-first, concatenates `lo‖hi`, grounds through the σ-axis prism to a composed κ (commutativity structural); norm-multiplicative via the octonion 8-square | uor-addr `composition/g2`, `canonicalize_g2` (ADR-061/059); `AtlasComposition` `eight_square` | some-true |
 | Dual / conjugation | `compose_f4` → CS-F4 ±mirror (2-element equivalence) = the Atlas mirror `μ` (order 2) | uor-addr `composition/f4`; `AtlasClasses` §3 `μ` | some-true |
 | Categorical structure | `e6` (2-class 8:1 grading), `e7` (24-element S₄ orbit = the `T·O` orbit), `e8` (identity/embedding into E8) | uor-addr `composition/{e6,e7,e8}` (CS-E6/E7/E8) | some-true |
