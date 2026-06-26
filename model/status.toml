@@ -1,0 +1,27 @@
+# The status ledger: the controlled vocabulary inherited from the UOR Atlas / F1.
+# A status is a CONTRACT on what the V&V suite may assert about a row.
+# Parsed by `tqc-model`; enforced by the honesty meta-gate in `tqc-conformance`.
+
+[[level]]
+id = "some-true"
+summary = "Established: an F1 theorem, a realized uor-addr operation, or a vv witness."
+may_assert = "green-gating"   # the implementation reproduces the sourced fact
+gating = true
+
+[[level]]
+id = "build"
+summary = "A precisely-scoped construction on sourced pieces; crux-independent; not yet asserted complete."
+may_assert = "axioms-only"    # validated against universal axioms / sourced reductions only
+gating = true
+
+[[level]]
+id = "open"
+summary = "A genuine unknown (universality, advantage). Measured and reported, never asserted true."
+may_assert = "measurement-only"
+gating = false
+
+[[level]]
+id = "none"
+summary = "The crux: signed prime-form positivity (RH). Neither assumed nor proved."
+may_assert = "nothing"
+gating = false

@@ -1,0 +1,117 @@
+//! The BDD suite. Each Gherkin step binds to a `tqc-vv` witness (DRY); the runner fails on any
+//! failed, skipped, or undefined step, so "fully implemented — no narrowing" is mechanical.
+//!
+//! Run with `just bdd` (or `cargo test -p tqc-conformance --test bdd`).
+
+// A custom-harness cucumber binary signals failure by panicking in steps and exiting non-zero.
+#![allow(
+    clippy::unwrap_used,
+    clippy::expect_used,
+    clippy::panic,
+    clippy::missing_panics_doc
+)]
+
+use cucumber::{given, then, World};
+use tqc_atlas::canonical;
+use tqc_core::generators::Generators;
+use tqc_core::{labels, UseCaseParams};
+use tqc_model::Model;
+use tqc_vv::{witness, F1Constants};
+
+#[derive(Debug, Default, cucumber::World)]
+struct TqcWorld {
+    model: Option<Model>,
+    f1: Option<F1Constants>,
+    params: Option<UseCaseParams>,
+}
+
+impl TqcWorld {
+    fn f1(&self) -> &F1Constants {
+        self.f1
+            .as_ref()
+            .expect("the F1 oracle constants step must run first")
+    }
+    fn params(&self) -> UseCaseParams {
+        self.params.expect("a use-case step must run first")
+    }
+}
+
+#[given("the F1 oracle constants")]
+async fn f1_oracle(w: &mut TqcWorld) {
+    let model = Model::load().unwrap();
+    let f1 = F1Constants::load().unwrap();
+    // Loading the oracle also asserts its provenance (sha256 == manifest pin).
+    witness::oracle_provenance(&model, &f1).unwrap();
+    w.model = Some(model);
+    w.f1 = Some(f1);
+}
+
+#[given("the UOR Atlas use-case")]
+async fn atlas_use_case(w: &mut TqcWorld) {
+    let model = w.model.take().unwrap_or_else(|| Model::load().unwrap());
+    w.params = Some(canonical(&model).unwrap());
+    w.model = Some(model);
+}
+
+#[given(expr = "an arbitrary use-case with scope {int} modality {int} context {int}")]
+async fn arbitrary_use_case(w: &mut TqcWorld, q: u32, t: u32, o: u32) {
+    w.params = Some(UseCaseParams::checked(q, t, o).unwrap());
+}
+
+#[then("the objects-labels witness reproduces the F1 Atlas")]
+async fn t_objects(w: &mut TqcWorld) {
+    witness::objects_labels(&w.params(), w.f1()).unwrap();
+}
+
+#[then("classIndex is a bijection over the whole class space")]
+async fn t_bijection(w: &mut TqcWorld) {
+    assert!(labels::class_index_is_bijection(&w.params()));
+}
+
+#[then("the label-space belt witness reproduces the F1 Atlas")]
+async fn t_belt(w: &mut TqcWorld) {
+    witness::label_space_belt(&w.params(), w.f1()).unwrap();
+}
+
+#[then("the inner product is the definite Euclidean companion")]
+async fn t_inner(w: &mut TqcWorld) {
+    witness::inner_product(&w.params()).unwrap();
+}
+
+#[then("the generators have the F1 orders and preserve the inner product")]
+async fn t_generators(w: &mut TqcWorld) {
+    witness::reflection_generators(&w.params(), w.f1()).unwrap();
+}
+
+#[then("the generators have orders scope, context and two")]
+async fn t_generator_orders(w: &mut TqcWorld) {
+    let p = w.params();
+    let g = Generators::new(&p);
+    assert_eq!(g.sigma.order(), u64::from(p.sigma_order()));
+    assert_eq!(g.tau.order(), u64::from(p.tau_order()));
+    assert_eq!(g.mu.order(), u64::from(p.mu_order()));
+}
+
+#[then("the spectrum reconciles with the F1 multiplicities and signature")]
+async fn t_spectrum(w: &mut TqcWorld) {
+    witness::spectrum(&w.params(), w.f1()).unwrap();
+}
+
+#[then("the Coxeter rank equals phi of the Coxeter number and the context")]
+async fn t_coxeter(w: &mut TqcWorld) {
+    witness::coxeter_weyl(&w.params(), w.f1()).unwrap();
+}
+
+#[then("the modular identity holds on the F1 coefficients")]
+async fn t_modular(w: &mut TqcWorld) {
+    witness::modular_identities(&w.params(), w.f1()).unwrap();
+}
+
+#[tokio::main]
+async fn main() {
+    let features = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../features/suites");
+    TqcWorld::cucumber()
+        .fail_on_skipped()
+        .run_and_exit(features)
+        .await;
+}

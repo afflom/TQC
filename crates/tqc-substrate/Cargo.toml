@@ -1,0 +1,24 @@
+# The substrate facade — the SOLE crate that names holospaces / hologram / uor-addr.
+# Excluded from the core workspace (see the root Cargo.toml) so its heavy dependency graph
+# does not slow the V&V/BDD core. Built in a dedicated CI job.
+[package]
+name = "tqc-substrate"
+description = "Facade over the holospaces substrate and the uor-addr composition operations."
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.83"
+license = "MIT"
+repository = "https://github.com/afflom/TQC"
+publish = false
+
+[dependencies]
+# Pinned to a reproducible revision. default-features = false keeps the build to the
+# content-addressing core (no wasmtime engine), which is all the facade needs today.
+holospaces = { git = "https://github.com/Hologram-Technologies/holospaces", rev = "f2415624e3a37162d9a30b4dbae776dcebb60e3e", default-features = false }
+uor-addr = "0.2.0"
+tqc-core = { path = "../tqc-core" }
+tqc-model = { path = "../tqc-model" }
+
+[lints.rust]
+unsafe_code = "forbid"
+missing_docs = "warn"

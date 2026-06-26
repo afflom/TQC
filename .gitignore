@@ -1,0 +1,10 @@
+/target
+crates/tqc-substrate/target
+**/*.rs.bk
+Cargo.lock.bak
+# Fetched oracle payloads are reproduced from provenance; only manifests + checksums
+# are committed. (The small F1 constants JSON is committed; large payloads are not.)
+/oracles/**/payload/
+# Local Lean/F1 build tree created by `cargo xtask atlas-extract`.
+/.f1-build
+.DS_Store
