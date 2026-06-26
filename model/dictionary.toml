@@ -146,8 +146,8 @@ source = "AtlasCoherence atlas_coherent; vv CC-2/29/30"
 status = "some-true"
 stage = "S3"
 oracle = "holospaces-cc"
-tier = "target"
-feature = "features/targets/s3_measurement/ground_space_protection.feature"
+tier = "suite"
+feature = "features/suites/s3_measurement/ground_space_protection.feature"
 
 # --- The 'build' rows: scoped constructions on sourced pieces, validated against MTC
 #     axioms only. Never asserted sound; crux-independent. ---
@@ -182,8 +182,8 @@ source = "(substrate stores bytes, not amplitudes) — build"
 status = "build"
 stage = "S0"
 oracle = "holospaces-cc"
-tier = "target"
-feature = "features/targets/s0_labels/complex_amplitude_encoding.feature"
+tier = "suite"
+feature = "features/suites/s0_labels/complex_amplitude_encoding.feature"
 
 # --- The 'open' rows: measured and reported, never asserted true. ---
 

@@ -170,6 +170,8 @@ fn run_suite_witness(
         "fusion-g2" => witness::fusion_g2(p),
         "dual-f4" => witness::dual_f4(p),
         "categorical-structure" => witness::categorical_structure(p),
+        "ground-space-protection" => witness::ground_space_protection(p),
+        "complex-amplitude-encoding" => witness::complex_amplitude_encoding(p),
         _ => return None,
     })
 }

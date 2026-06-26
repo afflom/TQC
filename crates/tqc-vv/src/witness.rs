@@ -5,6 +5,7 @@
 //! the cucumber step definitions in `tqc-conformance` call them (DRY).
 
 use crate::oracle::F1Constants;
+use tqc_core::amplitude::{self, Amplitude};
 use tqc_core::generators::{Generators, Permutation};
 use tqc_core::inner::{euclidean_norm_sq, preserves_norm};
 use tqc_core::{coxeter, labels, modular, octonion, spectrum, UseCaseParams};
@@ -363,6 +364,78 @@ pub fn categorical_structure(p: &UseCaseParams) -> Witness {
     Ok(())
 }
 
+/// VV — ground-space / topological protection: content-addressing is a faithful round-trip.
+/// `κ` is stable (CC-1), content re-derives to its `κ` (`π∘ι = id`), and distinct content has
+/// distinct `κ` (eviction drops bytes, not identity).
+///
+/// # Errors
+/// On unstable addressing, a failed re-derivation, or a `κ` collision.
+pub fn ground_space_protection(p: &UseCaseParams) -> Witness {
+    let n = p.class_count().min(8);
+    let mut seen: Vec<tqc_substrate::Kappa> = Vec::new();
+    for i in 0..n {
+        let state = anyon_bytes(p, i);
+        let k = tqc_substrate::kappa(&state);
+        check(
+            k == tqc_substrate::kappa(&state),
+            format!("kappa not stable at label {i}"),
+        )?;
+        check(
+            tqc_substrate::verify(&state, &k)?,
+            format!("content does not re-derive at label {i}"),
+        )?;
+        check(!seen.contains(&k), format!("kappa collision at label {i}"))?;
+        seen.push(k);
+    }
+    Ok(())
+}
+
+/// VV (build) — complex amplitude encoding: a fusion-space vector encodes to canonical bytes,
+/// round-trips through the content-addressed store (CC-1), and its Euclidean composition norm
+/// `Σ|cᵢ|²` equals the inner product on the encoded form.
+///
+/// # Errors
+/// On a failed round-trip, unstable addressing, or a norm mismatch.
+pub fn complex_amplitude_encoding(p: &UseCaseParams) -> Witness {
+    let n = p.class_count().min(8);
+    let state: Vec<(u64, Amplitude)> = (0..n)
+        .map(|i| {
+            (
+                i,
+                Amplitude {
+                    re: (i as i64) % 5 - 2,
+                    im: (i as i64) % 3 - 1,
+                },
+            )
+        })
+        .collect();
+    let bytes = amplitude::encode(&state);
+
+    let decoded = amplitude::decode(&bytes).ok_or_else(|| "amplitude decode failed".to_owned())?;
+    let mut canonical_state = state.clone();
+    canonical_state.sort_by_key(|(l, _)| *l);
+    check(
+        decoded == canonical_state,
+        "amplitude encode/decode does not round-trip",
+    )?;
+
+    let k = tqc_substrate::kappa(&bytes);
+    check(
+        k == tqc_substrate::kappa(&bytes),
+        "amplitude kappa not stable (CC-1)",
+    )?;
+    check(
+        tqc_substrate::verify(&bytes, &k)?,
+        "amplitude state does not re-derive (CC-1)",
+    )?;
+
+    let flat: Vec<i64> = state.iter().flat_map(|(_, a)| [a.re, a.im]).collect();
+    check(
+        amplitude::norm_sq(&state) == euclidean_norm_sq(&flat),
+        "Σ|c_i|² != the Euclidean inner product on the encoded form",
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -396,6 +469,8 @@ mod tests {
         fusion_g2(&p).unwrap();
         dual_f4(&p).unwrap();
         categorical_structure(&p).unwrap();
+        ground_space_protection(&p).unwrap();
+        complex_amplitude_encoding(&p).unwrap();
     }
 
     #[test]
@@ -405,5 +480,7 @@ mod tests {
         fusion_g2(&p).unwrap();
         dual_f4(&p).unwrap();
         categorical_structure(&p).unwrap();
+        ground_space_protection(&p).unwrap();
+        complex_amplitude_encoding(&p).unwrap();
     }
 }

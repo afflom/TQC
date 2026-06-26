@@ -132,6 +132,16 @@ async fn t_categorical(w: &mut TqcWorld) {
     witness::categorical_structure(&w.params()).unwrap();
 }
 
+#[then("the ground space round-trips with no loss")]
+async fn t_ground_space(w: &mut TqcWorld) {
+    witness::ground_space_protection(&w.params()).unwrap();
+}
+
+#[then("the complex amplitude encoding round-trips and preserves the norm")]
+async fn t_amplitude(w: &mut TqcWorld) {
+    witness::complex_amplitude_encoding(&w.params()).unwrap();
+}
+
 #[tokio::main]
 async fn main() {
     let features = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../features/suites");
