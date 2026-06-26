@@ -1278,6 +1278,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "tqc-mtc"
+version = "0.1.0"
+dependencies = [
+ "tqc-core",
+]
+
+[[package]]
 name = "tqc-substrate"
 version = "0.1.0"
 dependencies = [
@@ -1298,6 +1305,7 @@ dependencies = [
  "tqc-atlas",
  "tqc-core",
  "tqc-model",
+ "tqc-mtc",
  "tqc-substrate",
 ]
 

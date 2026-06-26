@@ -172,6 +172,8 @@ fn run_suite_witness(
         "categorical-structure" => witness::categorical_structure(p),
         "ground-space-protection" => witness::ground_space_protection(p),
         "complex-amplitude-encoding" => witness::complex_amplitude_encoding(p),
+        "modular-s-t" => witness::modular_s_t(p),
+        "braiding-r-matrix" => witness::braiding_r_matrix(p),
         _ => return None,
     })
 }

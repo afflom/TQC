@@ -436,6 +436,29 @@ pub fn complex_amplitude_encoding(p: &UseCaseParams) -> Witness {
     )
 }
 
+/// VV (build) — the modular S/T matrices satisfy the SL(2,ℤ) relations.
+///
+/// Constructed as the quantum double `D(Z_n)` (n = context), validated against the MTC axioms:
+/// S symmetric & unitary, T of finite order, `S⁴ = 1`, `(ST)³ = S²`, `S² = C`, and Verlinde
+/// reproduces the group-law fusion. Never asserted to be the unique Atlas category.
+///
+/// # Errors
+/// Returns the first axiom that fails.
+pub fn modular_s_t(p: &UseCaseParams) -> Witness {
+    tqc_mtc::verify_modular(p.context as usize, tqc_mtc::TOL)
+}
+
+/// VV (build) — the braiding R-matrix satisfies the hexagon and Yang–Baxter.
+///
+/// Constructed as the bicharacter braiding of `D(Z_n)` (n = context), validated against the MTC
+/// axioms: unitary phases, hexagon (bimultiplicativity), and the monodromy tying R to S.
+///
+/// # Errors
+/// Returns the first axiom that fails.
+pub fn braiding_r_matrix(p: &UseCaseParams) -> Witness {
+    tqc_mtc::verify_braiding(p.context as usize, tqc_mtc::TOL)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -471,6 +494,8 @@ mod tests {
         categorical_structure(&p).unwrap();
         ground_space_protection(&p).unwrap();
         complex_amplitude_encoding(&p).unwrap();
+        modular_s_t(&p).unwrap();
+        braiding_r_matrix(&p).unwrap();
     }
 
     #[test]
@@ -482,5 +507,7 @@ mod tests {
         categorical_structure(&p).unwrap();
         ground_space_protection(&p).unwrap();
         complex_amplitude_encoding(&p).unwrap();
+        modular_s_t(&p).unwrap();
+        braiding_r_matrix(&p).unwrap();
     }
 }

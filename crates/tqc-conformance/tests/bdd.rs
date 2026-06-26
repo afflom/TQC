@@ -142,6 +142,16 @@ async fn t_amplitude(w: &mut TqcWorld) {
     witness::complex_amplitude_encoding(&w.params()).unwrap();
 }
 
+#[then("the modular S and T satisfy the SL(2,Z) relations")]
+async fn t_modular_st(w: &mut TqcWorld) {
+    witness::modular_s_t(&w.params()).unwrap();
+}
+
+#[then("the braiding R satisfies the hexagon and Yang-Baxter")]
+async fn t_braiding(w: &mut TqcWorld) {
+    witness::braiding_r_matrix(&w.params()).unwrap();
+}
+
 #[tokio::main]
 async fn main() {
     let features = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../features/suites");

@@ -160,8 +160,8 @@ source = "(not in source) — build over generators + modular data"
 status = "build"
 stage = "S2"
 oracle = "mtc-axioms"
-tier = "target"
-feature = "features/targets/s2_mtc/braiding_r_matrix.feature"
+tier = "suite"
+feature = "features/suites/s2_mtc/braiding_r_matrix.feature"
 
 [[row]]
 id = "modular-s-t"
@@ -171,8 +171,8 @@ source = "(only the identities are in source) — build"
 status = "build"
 stage = "S2"
 oracle = "mtc-axioms"
-tier = "target"
-feature = "features/targets/s2_mtc/modular_s_t.feature"
+tier = "suite"
+feature = "features/suites/s2_mtc/modular_s_t.feature"
 
 [[row]]
 id = "complex-amplitude-encoding"
