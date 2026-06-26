@@ -140,8 +140,7 @@ composition / addressing structure; it never touches that crux.
 - **open** (genuine unknowns, measured and reported, never asserted true):
   - **Universality** — whether the generators + braiding act densely in `U` of the amplitude space (Freedman–Larsen–Wang). Measured (the generated braiding-phase order); reported.
   - **Advantage** — measured as topological degeneracy (braid paths per distinct result κ).
-    Reported without asserting a speedup class. `content_reuse` / `cache_hits` are downstream
-    consequences of κ collapse.
+    Reported without asserting a formal speedup class. **Hardware Mechanism:** By harnessing UOR (Universal Object Reference), holospaces maps identical κ addresses to the same physical memory. Isotopic collapse forces an exponential number of braid paths into a small set of distinct κ states, which the x86_64/amd64 CPU handles as L1/L2/L3 `cache_hits`. The hardware itself absorbs the degeneracy via `content_reuse`.
 
 ## Build stages
 

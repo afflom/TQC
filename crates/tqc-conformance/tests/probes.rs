@@ -50,7 +50,7 @@ async fn advantage(_w: &mut ProbeWorld) {
 
 #[then("the Atlas-native MTC construction returns an obstruction")]
 async fn t_atlas_native_mtc_obstruction(_w: &mut ProbeWorld) {
-    let res = tqc_mtc::native::construct_atlas_native();
+    let res = tqc_mtc::native::construct_atlas_native(&atlas());
     assert!(res.is_err());
 }
 

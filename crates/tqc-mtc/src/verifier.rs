@@ -30,7 +30,9 @@ pub trait ModularData {
 /// - Yang–Baxter coverage and monodromy consistency for general non-pointed MTCs.
 /// - Full nonnegative integral Verlinde fusion checks linking `S` to `N_{ij}^k`.
 ///
-/// *Note:* The pointed `D(Z_n)` specialization (in `lib.rs`) implements its own specialized checks for the hexagon, Yang-Baxter, and Verlinde formula that are not verified here for arbitrary non-pointed categories.
+/// *Crucial Distinction:* This generalized verifier does **not** check pentagon or hexagon coherence, because those checks are not yet implemented for an arbitrary (non-pointed) MTC.
+/// By contrast, the pointed `D(Z_n)` representative (in `lib.rs`) implements its own specialized, exact checks for the hexagon, Yang-Baxter, and Verlinde formula that hold specifically because the category is pointed (bicharacter braiding).
+/// The generalized verifier must never assert `some-true` or `build` for full pentagon/hexagon coherence until those checks are actually implemented.
 ///
 /// # Errors
 /// Returns a description of the first axiom that fails within `tol`.
@@ -87,6 +89,7 @@ pub fn verify_mtc_axioms<M: ModularData>(m: &M, tol: f64) -> Result<(), String> 
     }
 
     // A complete implementation loops over objects and channels to verify pentagon and hexagon coherence.
-    // We establish the signature to satisfy the oracle requirement.
+    // We intentionally leave these checks unimplemented and return Ok(()) ONLY for the limited subset of axioms actually verified here (S/T relations and fusion non-negativity).
+    // Do NOT assert full MTC coherence based on this verifier alone.
     Ok(())
 }

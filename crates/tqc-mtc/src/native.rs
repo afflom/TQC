@@ -23,31 +23,55 @@
 //! Because of this obstruction, `D(Z_O)` remains the explicitly designated generic representative
 //! stand-in. The `verify_mtc_axioms` oracle from the `verifier` module would reject the `g2`
 //! structure constants due to the non-negative integer requirement.
+//!
+//! **Future Work as Conditional Research:**
+//! Any future Atlas-native category construction is treated purely as an experimental research branch
+//! contingent on either new external source material, a newly derived simple-object basis, or a
+//! rigorous mathematical structural transformation linking Atlas composition to valid categorical fusion.
 
 use crate::verifier::ModularData;
+use tqc_core::params::UseCaseParams;
+use tqc_core::spectrum;
 
 /// Represents the failure to construct an Atlas-native MTC.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ConstructionObstruction {
+    /// Mismatch between the classes count and the carrier space dimensions for the $S$-matrix.
+    DimensionMismatch(u64, u64),
+    /// The spectral operator is indefinite, obstructing a unitary S-matrix.
+    IndefiniteSpectralSignature,
     /// The `g2` composition yields signed structure constants, violating $N_{ij}^k \ge 0$.
     SignedFusionConstants,
-    /// Mismatch between the 96 classes and the 24-dimensional carrier space for the $S$-matrix.
-    DimensionMismatch,
 }
 
 impl core::fmt::Display for ConstructionObstruction {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
+            Self::DimensionMismatch(classes, carrier) => write!(f, "mismatch between {classes} classes and {carrier}-dimensional S-matrix carrier"),
+            Self::IndefiniteSpectralSignature => write!(f, "the spectral operator is indefinite, obstructing a unitary S-matrix"),
             Self::SignedFusionConstants => write!(f, "compose_g2_product yields signed structure constants, violating MTC nonnegative fusion"),
-            Self::DimensionMismatch => write!(f, "mismatch between 96 Atlas classes and 24-dimensional S-matrix carrier"),
         }
     }
 }
 
 impl std::error::Error for ConstructionObstruction {}
 
-/// Attempt to construct an Atlas-native MTC.
+/// Attempt to construct an Atlas-native MTC from parameters.
 /// Always returns an obstruction under current sourced material constraints.
-pub fn construct_atlas_native() -> Result<Box<dyn ModularData>, ConstructionObstruction> {
+pub fn construct_atlas_native(
+    p: &UseCaseParams,
+) -> Result<Box<dyn ModularData>, ConstructionObstruction> {
+    if p.class_count() != p.carrier_dim() {
+        return Err(ConstructionObstruction::DimensionMismatch(
+            p.class_count(),
+            p.carrier_dim(),
+        ));
+    }
+
+    let ev = spectrum::block_eigenvalues(p);
+    if ev.iter().any(|&e| e < 0) {
+        return Err(ConstructionObstruction::IndefiniteSpectralSignature);
+    }
+
     Err(ConstructionObstruction::SignedFusionConstants)
 }
