@@ -108,21 +108,15 @@ and validated against them:
 The braiding too is realized by the Atlas's *own* generators: a braid word over `σ/τ/μ`
 (exercised by the holospace cycle and the degeneracy probe) is an Atlas-native braid.
 
-**One correction.** `g2` is the Atlas's composition *norm*, **not** a fusion ring on the 96
-classes. It composes on the normed-division-algebra tower / the `V_T ⊗ V_O` carrier; asking
-whether it "closes on the classes as simple objects" is a category error — the Atlas defines no
-fusion ring on the classes, and there is nothing there to obstruct.
+The Atlas supplies the *native data* relevant to a possible MTC construction — the modular forms (`AtlasModular`), the reflection generators, the E₈ Weyl symmetry (`AtlasCoxeter`), and the 24-dim carrier.
 
-**The one layered build.** F1 carries no explicit modular-tensor-category *matrices*. The
-`modular-s-t` and `braiding-r-matrix` rows therefore *construct* the explicit `S`/`T`/`R` and
-validate them against the universal MTC axioms (SL(2,ℤ): `S` symmetric & unitary, `S⁴=1`,
-`(ST)³=S²`, `S²=C`; hexagon; Yang–Baxter; Verlinde). The current build realizes them via the
-generic quantum double `D(Z_n)` (instantiated as `D(Z_O)` for `O = context`) — a concrete, anomaly-free pointed MTC that lets
-the axioms be exercised, never claimed to be the Atlas's own category. The Atlas supplies the
-*native data* to build these matrices directly — the modular forms (`AtlasModular`), the
-reflection generators, the E₈ Weyl symmetry (`AtlasCoxeter`), and the 24-dim carrier — and
-deriving the `S`/`T`/`R` from that data, axiom-consistent, is the genuine remaining direction
-(not obstructed, just not yet done). `D(Z_n)` is the generic representative MTC build, with `D(Z_O)` as the current Atlas-parameterized stand-in (not the Atlas-native category).
+**Atlas-native obstruction.** The repo attempted the Atlas-native construction under current constraints. The current result is an obstruction, not a completed Atlas-native category. The obstruction has two components:
+1. `g2` structure constants come from normed-division-algebra composition and can carry signs, while MTC fusion coefficients must be nonnegative integers.
+2. The Atlas has 96 class labels but the carrier `V_T ⊗ V_O` is 24-dimensional, creating an unresolved simple-object / carrier-dimension mismatch for an Atlas-native modular datum.
+
+**The representative MTC build.** Since the Atlas-native construction is obstructed, the explicit `S`/`T`/`R` matrices are currently built via the generic quantum double `D(Z_n)` (a concrete, anomaly-free pointed MTC). This is validated against the universal MTC axioms (SL(2,ℤ): `S` symmetric & unitary, `S⁴=1`, `(ST)³=S²`, `S²=C`; hexagon; Yang–Baxter; Verlinde). `D(Z_n)` remains the generic representative MTC build. For the Atlas, `D(Z_O)` (where `O = context`) remains the Atlas-parameterized stand-in (not the Atlas-native category).
+
+Future Atlas-native category work requires either new source data, a new derived simple-object set, or a structural transformation relating Atlas composition to categorical fusion.
 
 The Atlas's §9 is explicit that its definite composition norm is a *different object* from the
 signed prime form whose positivity is RH (F1's open crux). The TQC uses only the definite /

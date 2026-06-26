@@ -1,4 +1,4 @@
-use crate::{close_mat, identity, is_symmetric, is_unitary, mat_pow, matmul, zeros, Matrix, C};
+use crate::{close_mat, identity, is_symmetric, is_unitary, mat_pow, zeros, Matrix, C};
 
 /// Data for a generic Modular Tensor Category (MTC), potentially non-pointed.
 pub trait ModularData {
@@ -29,8 +29,12 @@ pub fn verify_mtc_axioms<M: ModularData>(m: &M, tol: f64) -> Result<(), String> 
     let s = m.s_matrix();
     let t = m.t_diag();
 
-    if !is_symmetric(&s, tol) { return Err("S is not symmetric".into()); }
-    if !is_unitary(&s, tol) { return Err("S is not unitary".into()); }
+    if !is_symmetric(&s, tol) {
+        return Err("S is not symmetric".into());
+    }
+    if !is_unitary(&s, tol) {
+        return Err("S is not unitary".into());
+    }
 
     for (i, theta) in t.iter().enumerate() {
         if (theta.abs2() - 1.0).abs() > tol {
@@ -42,7 +46,7 @@ pub fn verify_mtc_axioms<M: ModularData>(m: &M, tol: f64) -> Result<(), String> 
     if !close_mat(&mat_pow(&s, 4), &identity(dim), tol) {
         return Err("S^4 != I".into());
     }
-    
+
     // (ST)^3 = S^2
     let mut st = zeros(dim);
     for (i, row) in st.iter_mut().enumerate() {
@@ -64,7 +68,9 @@ pub fn verify_mtc_axioms<M: ModularData>(m: &M, tol: f64) -> Result<(), String> 
             for k in 0..dim {
                 let n_val = m.n_ijk(i, j, k);
                 if n_val < -tol || (n_val - n_val.round()).abs() > tol {
-                    return Err(format!("N_{{{i},{j}}}^{k} is not a nonnegative integer: {n_val}"));
+                    return Err(format!(
+                        "N_{{{i},{j}}}^{k} is not a nonnegative integer: {n_val}"
+                    ));
                 }
             }
         }

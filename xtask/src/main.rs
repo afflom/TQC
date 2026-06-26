@@ -143,10 +143,10 @@ fn report() -> Result<()> {
     lines.push(format!("\nsuites: {passed}/{suites} passed"));
 
     // Open probes: measurements only, never asserted.
-    let uni = witness::universality_probe(&p).unwrap_or(0);
+    let uni = witness::universality_probe(&p).unwrap_or_else(|e| e);
     let adv = witness::advantage_probe(&p).unwrap_or(0.0);
     lines.push(format!(
-        "open probes (measured, never asserted): universality D(Z_O) braiding-phase order = {uni}; \
+        "open probes (measured, never asserted): universality = {uni}; \
          advantage topological degeneracy = {adv:.3} braid-paths/κ\n"
     ));
 

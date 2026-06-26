@@ -12,7 +12,9 @@
 
 #![forbid(unsafe_code)]
 
+/// The Atlas-native category construction.
 pub mod native;
+/// The verification logic for general MTCs.
 pub mod verifier;
 
 use core::f64::consts::PI;

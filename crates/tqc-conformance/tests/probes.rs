@@ -28,7 +28,10 @@ fn atlas() -> tqc_core::UseCaseParams {
 async fn universality(_w: &mut ProbeWorld) {
     let result = witness::universality_probe(&atlas()).unwrap();
     println!("[probe] universality: {result}");
-    assert!(!result.is_empty(), "a measurement or obstruction must be produced");
+    assert!(
+        !result.is_empty(),
+        "a measurement or obstruction must be produced"
+    );
 }
 
 #[then("the topological degeneracy is measured and advantage remains open and unasserted")]

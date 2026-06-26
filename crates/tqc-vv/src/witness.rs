@@ -536,10 +536,14 @@ pub fn holospace_cycle(p: &UseCaseParams) -> Witness {
     )
 }
 
+/// A probe testing the universality of the Atlas-native category construction.
+/// Measures whether the braiding closure is dense or finite, or if it is obstructed.
 pub fn universality_probe(_p: &UseCaseParams) -> Result<String, String> {
     match tqc_mtc::native::construct_atlas_native() {
         Ok(_) => Ok("dense or finite (measured)".into()),
-        Err(e) => Ok(format!("obstructed because §2 did not produce a valid Atlas-native braid representation: {e}")),
+        Err(e) => Ok(format!(
+            "obstructed because §2 did not produce a valid Atlas-native braid representation: {e}"
+        )),
     }
 }
 
