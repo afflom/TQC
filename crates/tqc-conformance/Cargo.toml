@@ -13,6 +13,7 @@ tqc-model = { workspace = true }
 tqc-core = { workspace = true }
 tqc-atlas = { workspace = true }
 tqc-vv = { workspace = true }
+tqc-mtc = { workspace = true }
 
 [dev-dependencies]
 cucumber = { workspace = true }

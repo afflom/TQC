@@ -48,12 +48,18 @@ async fn advantage(_w: &mut ProbeWorld) {
     );
 }
 
+#[then("the Atlas-native MTC construction returns an obstruction")]
+async fn t_atlas_native_mtc_obstruction(_w: &mut ProbeWorld) {
+    let res = tqc_mtc::native::construct_atlas_native();
+    assert!(res.is_err());
+}
+
 #[tokio::main]
 async fn main() {
-    let features =
-        std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../features/targets/s4_open");
+    let targets =
+        std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../features/targets");
     ProbeWorld::cucumber()
         .fail_on_skipped()
-        .run_and_exit(features)
+        .run_and_exit(targets)
         .await;
 }
