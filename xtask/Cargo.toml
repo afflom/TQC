@@ -18,6 +18,7 @@ sha2 = { workspace = true }
 hex = { workspace = true }
 anyhow = { workspace = true }
 tqc-mtc.workspace = true
+tqc-substrate.workspace = true
 
 [lints]
 workspace = true
