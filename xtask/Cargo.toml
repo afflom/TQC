@@ -10,13 +10,14 @@ authors.workspace = true
 publish = false
 
 [dependencies]
-tqc-model = { workspace = true }
-tqc-core = { workspace = true }
-tqc-atlas = { workspace = true }
+tqc-model.workspace = true
+tqc-core.workspace = true
+tqc-atlas.workspace = true
 tqc-vv = { workspace = true }
 sha2 = { workspace = true }
 hex = { workspace = true }
 anyhow = { workspace = true }
+tqc-mtc.workspace = true
 
 [lints]
 workspace = true

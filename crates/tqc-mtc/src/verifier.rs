@@ -37,7 +37,7 @@ pub trait ModularData {
 /// # Errors
 /// Returns a description of the first axiom that fails within `tol`.
 #[allow(clippy::needless_range_loop)]
-pub fn verify_mtc_axioms<M: ModularData>(m: &M, tol: f64) -> Result<(), String> {
+pub fn verify_mtc_axioms(m: &dyn ModularData, tol: f64) -> Result<(), String> {
     let dim = m.dim();
     let s = m.s_matrix();
     let t = m.t_diag();
@@ -60,15 +60,30 @@ pub fn verify_mtc_axioms<M: ModularData>(m: &M, tol: f64) -> Result<(), String> 
         return Err("S^4 != I".into());
     }
 
-    // (ST)^3 = S^2
+    // (ST)^3 = p^+ S^2 (where p^+ is the anomaly phase e^{i pi c / 4})
     let mut st = zeros(dim);
     for (i, row) in st.iter_mut().enumerate() {
         for (j, cell) in row.iter_mut().enumerate() {
             *cell = s[i][j].times(t[j]);
         }
     }
-    if !close_mat(&mat_pow(&st, 3), &s2, tol) {
-        return Err("(ST)^3 != S^2".into());
+    let st3 = mat_pow(&st, 3);
+    // Extract the anomaly phase from the identity element
+    let p_plus = st3[0][0];
+    if (p_plus.abs2() - 1.0).abs() > tol {
+        return Err(format!(
+            "Anomaly phase p^+ has invalid magnitude: {}",
+            p_plus.abs2().sqrt()
+        ));
+    }
+    let mut scaled_s2 = zeros(dim);
+    for (i, row) in scaled_s2.iter_mut().enumerate() {
+        for (j, cell) in row.iter_mut().enumerate() {
+            *cell = s2[i][j].times(p_plus);
+        }
+    }
+    if !close_mat(&st3, &scaled_s2, tol) {
+        return Err("(ST)^3 != p^+ S^2".into());
     }
 
     if !close_mat(&s2, &m.charge_conjugation(), tol) {

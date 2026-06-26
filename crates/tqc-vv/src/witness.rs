@@ -443,9 +443,13 @@ pub fn complex_amplitude_encoding(p: &UseCaseParams) -> Witness {
 /// reproduces the group-law fusion. Never asserted to be the unique Atlas category.
 ///
 /// # Errors
-/// Returns the first axiom that fails.
+/// VV (build) — the modular S/T matrices satisfy the SL(2,ℤ) relations.
 pub fn modular_s_t(p: &UseCaseParams) -> Witness {
-    tqc_mtc::verify_modular(p.context as usize, tqc_mtc::TOL)
+    let native = match tqc_mtc::native::construct_atlas_native(p) {
+        Ok(n) => n,
+        Err(e) => return Err(e.to_string()),
+    };
+    tqc_mtc::verifier::verify_mtc_axioms(&*native, tqc_mtc::TOL)
 }
 
 /// VV (build) — the braiding R-matrix satisfies the hexagon and Yang–Baxter.
@@ -456,7 +460,11 @@ pub fn modular_s_t(p: &UseCaseParams) -> Witness {
 /// # Errors
 /// Returns the first axiom that fails.
 pub fn braiding_r_matrix(p: &UseCaseParams) -> Witness {
-    tqc_mtc::verify_braiding(p.context as usize, tqc_mtc::TOL)
+    let native = match tqc_mtc::native::construct_atlas_native(p) {
+        Ok(n) => n,
+        Err(e) => return Err(e.to_string()),
+    };
+    tqc_mtc::verifier::verify_mtc_axioms(&*native, tqc_mtc::TOL)
 }
 
 /// VV (build) — the holospace lift: a braid → fuse → read cycle running as one holospace on
@@ -611,8 +619,14 @@ pub fn universality_probe(p: &UseCaseParams) -> Result<UniversalityMetrics, Stri
                 let n_val = native_mtc.n_ijk(i, j, k);
                 if n_val > 1e-9 {
                     // Normalize string to avoid float precision issues in hashset
-                    let re = (r.re * 1e4).round() / 1e4;
-                    let im = (r.im * 1e4).round() / 1e4;
+                    let mut re = (r.re * 1e4).round() / 1e4;
+                    let mut im = (r.im * 1e4).round() / 1e4;
+                    if re == -0.0 {
+                        re = 0.0;
+                    }
+                    if im == -0.0 {
+                        im = 0.0;
+                    }
                     distinct_phases.insert(format!("{re:.4}+{im:.4}i"));
                 } else if r.re.abs() > 1e-9 || r.im.abs() > 1e-9 {
                     is_diagonal = false;

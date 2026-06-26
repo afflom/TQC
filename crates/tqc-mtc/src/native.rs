@@ -87,7 +87,7 @@ impl ModularData for AtlasNative {
                 let c2 = y % 8;
 
                 // Modality Z_3 (scope=4 condensed to 1 via gauging)
-                let theta = 4.0 * core::f64::consts::PI * (m1 * m2) as f64 / 3.0;
+                let theta = 2.0 * core::f64::consts::PI * (m1 * m2) as f64 / 3.0;
                 let phase3 = C::phase(theta);
 
                 // Context Z_2^3 (derived from the associative absolute quotient of octonions)
