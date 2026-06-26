@@ -140,7 +140,15 @@ fn report() -> Result<()> {
             row.id, row.status, row.tier, row.stage, result
         ));
     }
-    lines.push(format!("\nsuites: {passed}/{suites} passed\n"));
+    lines.push(format!("\nsuites: {passed}/{suites} passed"));
+
+    // Open probes: measurements only, never asserted.
+    let uni = witness::universality_probe(&p).unwrap_or(0);
+    let adv = witness::advantage_probe(&p).unwrap_or(0.0);
+    lines.push(format!(
+        "open probes (measured, never asserted): universality braiding-phase order = {uni}; \
+         advantage content-reuse ratio = {adv:.3}\n"
+    ));
 
     let report = lines.join("\n");
     let out_dir = root().join("target/conformance");

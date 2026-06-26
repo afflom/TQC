@@ -44,16 +44,18 @@ change in one concern touches one crate.
 | Crate | Responsibility | Changes when… |
 |---|---|---|
 | `tqc-model` | Parses `model/*.toml` into typed, invariant-checked registries (dictionary, status ledger, oracle registry) and the parametric `UseCaseParams`. No math, no substrate. | the conceptual model changes |
-| `tqc-core` | The **parametric** MTC framework: the generic label space, generators, inner product, fusion/dual interfaces, braiding & modular data — generic over a use-case. DRY home of all behavior. | the mathematics changes |
-| `tqc-atlas` | The UOR Atlas **use-case instance** `(q=4, T=3, O=8)` over `tqc-core`, plus its F1-sourced expectations. | the Atlas instance changes |
-| `tqc-vv` | V&V witnesses + loaders for external oracle artifacts (with checksum verification). | an oracle or a witness changes |
-| `tqc-conformance` | The cucumber BDD runner, the step definitions, and the honesty meta-gate (model ⇄ features ⇄ witnesses cross-check). | the BDD/gate wiring changes |
-| `xtask` | Automation: oracle verification, F1 re-derivation, conformance reporting. | tooling changes |
-| `tqc-substrate` *(added once verified)* | The **sole** importer of holospaces / hologram / uor-addr. Narrows their API behind stable traits. | the substrate API changes |
+| `tqc-core` | The **parametric** MTC framework: label space, generators, inner product, spectrum, coxeter, modular, octonion eight-square, E8 PSD anchor, amplitude encoding — generic over a use-case, `no_std`. DRY home of all pure behavior. | the mathematics changes |
+| `tqc-atlas` | The UOR Atlas **use-case instance** `(q=4, T=3, O=8)` over `tqc-core`, the use-case registry, and the E8 Cartan/Gram. | the Atlas instance changes |
+| `tqc-mtc` | The **MTC builds**: the modular `S`/`T` and braiding `R` constructed as the quantum double `D(Z_n)` and validated against the MTC axioms. Generic over the use-case; `std`. | the MTC construction changes |
+| `tqc-substrate` | The **sole** importer of holospaces / hologram / uor-addr. Exposes κ-addressing and the realized `g2`/`f4`/`e6`/`e7`/`e8` compositions across all five σ-axes. | the substrate API changes |
+| `tqc-vv` | V&V witnesses + loaders for external oracle artifacts (with checksum verification); binds each row to its oracle. | an oracle or a witness changes |
+| `tqc-conformance` | The cucumber BDD runner (gating suites + the open-probe harness), the step definitions, and the honesty meta-gate (model ⇄ features ⇄ witnesses cross-check + parametricity leak-check). | the BDD/gate wiring changes |
+| `xtask` | Automation: oracle verification, F1 pin checking, conformance reporting. | tooling changes |
 
-**Why a facade for the substrate.** Exactly one crate may name holospaces/hologram/uor-addr.
-When the pinned substrate revision moves, the blast radius is one crate, and the math crates
-stay reasoning- and test-able without the substrate present.
+**Why a facade for the substrate.** Exactly one crate (`tqc-substrate`) may name
+holospaces/hologram/uor-addr. The pure math crates (`tqc-model`, `tqc-core`, `tqc-atlas`,
+`tqc-mtc`) stay substrate-free and offline/`no_std`-testable; when the pinned substrate revision
+moves, the blast radius is one crate.
 
 ## 3. The parametric framework
 

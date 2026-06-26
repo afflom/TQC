@@ -91,8 +91,7 @@ oracle = "f1-atlas"
 tier = "suite"
 feature = "features/suites/s1_generators/modular_identities.feature"
 
-# --- Sourced rows whose realization needs the substrate facade (uor-addr / holospaces).
-#     Defined as targets (expected-RED, non-gating) until tqc-substrate is wired in. ---
+# --- Sourced rows realized through the substrate facade (uor-addr / holospaces). ---
 
 [[row]]
 id = "fusion-g2"

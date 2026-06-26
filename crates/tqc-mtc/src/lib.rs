@@ -355,9 +355,38 @@ pub fn verify_braiding(n: usize, tol: f64) -> Result<(), String> {
     Ok(())
 }
 
+/// A measurement for the universality probe: the number of distinct braiding phases
+/// `R_{x,y} = ω^{a'b}` for `D(Z_n)`. This is the size of the generated phase set — finite for
+/// the abelian double, so the braiding closure is *not* dense. A measurement only; universality
+/// is neither asserted nor denied.
+#[must_use]
+pub fn generated_phase_order(n: usize) -> usize {
+    if n == 0 {
+        return 0;
+    }
+    let d = DoubleZn { n };
+    let dim = d.dim();
+    let mut residues = std::collections::BTreeSet::new();
+    for x in 0..dim {
+        let (_, b) = d.coords(x);
+        for y in 0..dim {
+            let (a2, _) = d.coords(y);
+            residues.insert((a2 * b) % n);
+        }
+    }
+    residues.len()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn generated_phase_order_is_finite() {
+        // Finite (abelian double) — a measurement, not a universality claim.
+        assert!(generated_phase_order(8) >= 1);
+        assert!(generated_phase_order(4) >= 1);
+    }
 
     #[test]
     fn modular_relations_hold_for_small_doubles() {

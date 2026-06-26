@@ -1,6 +1,6 @@
 @row:advantage @stage:S4 @status:open @oracle:holospaces-cc @target
-Feature: Advantage (TARGET — open; measured and reported, never asserted)
-  # Whether content-addressed elision collapses cost below classical is a measurement.
-  Scenario: content-reuse / elision is benchmarked and reported, never asserted
-    Given a content-reuse benchmark probe
-    Then the measured elision is recorded and advantage remains open and unasserted
+Feature: Advantage (open; measured and reported, never asserted)
+  # Whether content-addressed elision collapses cost below classical is a measurement. This
+  # probe records the content-reuse ratio only; it never asserts a speedup class. Non-gating.
+  Scenario: the content-reuse ratio is measured
+    Then the content-reuse ratio is measured and advantage remains open and unasserted

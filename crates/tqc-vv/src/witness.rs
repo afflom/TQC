@@ -459,6 +459,44 @@ pub fn braiding_r_matrix(p: &UseCaseParams) -> Witness {
     tqc_mtc::verify_braiding(p.context as usize, tqc_mtc::TOL)
 }
 
+/// PROBE (open) — universality: measure the size of the generated braiding-phase set. Finite
+/// for the constructed pointed model, so the braiding closure is not dense. This returns a
+/// MEASUREMENT only; universality is neither asserted nor denied.
+///
+/// # Errors
+/// Never fails; returns the measured order.
+pub fn universality_probe(p: &UseCaseParams) -> Result<usize, String> {
+    Ok(tqc_mtc::generated_phase_order(p.context as usize))
+}
+
+/// PROBE (open) — advantage: measure the content-addressed reuse ratio (cache hits / total)
+/// when the same states are re-addressed. This returns a MEASUREMENT only; no speedup class is
+/// asserted.
+///
+/// # Errors
+/// Never fails; returns the measured ratio in `[0, 1]`.
+pub fn advantage_probe(p: &UseCaseParams) -> Result<f64, String> {
+    let n = p.class_count().min(8);
+    let mut seen: Vec<tqc_substrate::Kappa> = Vec::new();
+    let mut calls = 0u64;
+    let mut hits = 0u64;
+    for _round in 0..3 {
+        for i in 0..n {
+            let k = tqc_substrate::kappa(&anyon_bytes(p, i));
+            calls += 1;
+            if seen.contains(&k) {
+                hits += 1;
+            } else {
+                seen.push(k);
+            }
+        }
+    }
+    if calls == 0 {
+        return Ok(0.0);
+    }
+    Ok(hits as f64 / calls as f64)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

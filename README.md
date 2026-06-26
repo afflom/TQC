@@ -42,8 +42,10 @@ framework. See [`docs/architecture/ARCHITECTURE.md`].
 | `docs/architecture/` | architecture of the workspace + the parametric framework |
 | `model/` | the conceptual model as typed data (dictionary, status ledger, oracles) |
 | `crates/tqc-model` | parses `model/` into typed, validated registries |
-| `crates/tqc-core` | the **parametric** MTC framework (DRY core) |
+| `crates/tqc-core` | the **parametric** MTC framework (DRY core, `no_std`) |
 | `crates/tqc-atlas` | the UOR Atlas use-case instance (F1-validated) |
+| `crates/tqc-mtc` | the MTC builds: modular `S`/`T` and braiding `R` (axiom-validated) |
+| `crates/tqc-substrate` | the sole facade over holospaces / hologram / uor-addr |
 | `crates/tqc-vv` | V&V witnesses + external-oracle loaders |
 | `crates/tqc-conformance` | the BDD (cucumber) runner + the honesty meta-gate |
 | `features/` | Gherkin `.feature` definitions (BDD-first) |
