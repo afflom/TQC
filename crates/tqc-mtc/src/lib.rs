@@ -245,6 +245,50 @@ impl DoubleZn {
     }
 }
 
+impl verifier::ModularData for DoubleZn {
+    fn dim(&self) -> usize {
+        (*self).dim()
+    }
+    fn s_matrix(&self) -> Matrix {
+        (*self).s_matrix()
+    }
+    fn t_diag(&self) -> Vec<C> {
+        (*self).t_diag()
+    }
+    fn charge_conjugation(&self) -> Matrix {
+        (*self).charge_conjugation()
+    }
+    fn n_ijk(&self, i: usize, j: usize, k: usize) -> f64 {
+        if self.add_obj(i, j) == k {
+            1.0
+        } else {
+            0.0
+        }
+    }
+    fn f_symbol(&self, _i: usize, _j: usize, _k: usize, _l: usize, m: usize, n: usize) -> C {
+        // Pointed category with trivial 3-cocycle
+        // F is a 1x1 identity matrix in the 1-dimensional space of valid channels.
+        // For invalid channels, it's 0.
+        // (i*j) = m, (m*k) = l, (j*k) = n, (i*n) = l.
+        if self.add_obj(_i, _j) == m
+            && self.add_obj(m, _k) == _l
+            && self.add_obj(_j, _k) == n
+            && self.add_obj(_i, n) == _l
+        {
+            C::new(1.0, 0.0)
+        } else {
+            C::new(0.0, 0.0)
+        }
+    }
+    fn r_symbol(&self, i: usize, j: usize, k: usize) -> C {
+        if self.add_obj(i, j) == k {
+            self.r(i, j)
+        } else {
+            C::new(0.0, 0.0)
+        }
+    }
+}
+
 /// Verify the SL(2,ℤ) modular relations for `D(Z_n)`: `S` symmetric & unitary, `T` of finite
 /// order, `S⁴ = 1`, `(ST)³ = S²`, `S² = C` (charge conjugation), and Verlinde reproduces the
 /// group-law fusion.

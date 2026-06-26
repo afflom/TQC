@@ -36,6 +36,7 @@ pub trait ModularData {
 ///
 /// # Errors
 /// Returns a description of the first axiom that fails within `tol`.
+#[allow(clippy::needless_range_loop)]
 pub fn verify_mtc_axioms<M: ModularData>(m: &M, tol: f64) -> Result<(), String> {
     let dim = m.dim();
     let s = m.s_matrix();
@@ -74,22 +75,212 @@ pub fn verify_mtc_axioms<M: ModularData>(m: &M, tol: f64) -> Result<(), String> 
         return Err("S^2 != charge conjugation".into());
     }
 
-    // Fusion nonnegative integers
+    // Find identity object
+    let mut identity_obj = None;
+    for i in 0..dim {
+        let mut is_id = true;
+        for j in 0..dim {
+            for k in 0..dim {
+                let n_val = m.n_ijk(i, j, k);
+                let expected = if j == k { 1.0 } else { 0.0 };
+                if (n_val - expected).abs() > tol {
+                    is_id = false;
+                    break;
+                }
+            }
+            if !is_id {
+                break;
+            }
+        }
+        if is_id {
+            identity_obj = Some(i);
+            break;
+        }
+    }
+    let e =
+        identity_obj.ok_or_else(|| "No identity object found (N_{e,i}^j != δ_{ij})".to_string())?;
+
+    // Verlinde formula
     for i in 0..dim {
         for j in 0..dim {
             for k in 0..dim {
                 let n_val = m.n_ijk(i, j, k);
-                if n_val < -tol || (n_val - n_val.round()).abs() > tol {
-                    return Err(format!(
-                        "N_{{{i},{j}}}^{k} is not a nonnegative integer: {n_val}"
-                    ));
+                let mut sum = C::new(0.0, 0.0);
+                for l in 0..dim {
+                    let s_0l = s[e][l];
+                    if s_0l.abs2() < 1e-14 {
+                        return Err(format!("S_{{0,{l}}} is zero, obstructing Verlinde"));
+                    }
+                    let inv = C::new(s_0l.re / s_0l.abs2(), -s_0l.im / s_0l.abs2());
+                    let term = s[i][l].times(s[j][l]).times(s[k][l].conj());
+                    sum = sum.plus(term.times(inv));
+                }
+                if (sum.re - n_val).abs() > tol || sum.im.abs() > tol {
+                    return Err(format!("Verlinde formula fails at N_{{{i},{j}}}^{k}"));
                 }
             }
         }
     }
 
-    // A complete implementation loops over objects and channels to verify pentagon and hexagon coherence.
-    // We intentionally leave these checks unimplemented and return Ok(()) ONLY for the limited subset of axioms actually verified here (S/T relations and fusion non-negativity).
-    // Do NOT assert full MTC coherence based on this verifier alone.
+    // Pentagon equation
+    for i1 in 0..dim {
+        for i2 in 0..dim {
+            for i3 in 0..dim {
+                for i4 in 0..dim {
+                    for i5 in 0..dim {
+                        for a in 0..dim {
+                            if m.n_ijk(i1, i2, a) < tol {
+                                continue;
+                            }
+                            for b in 0..dim {
+                                if m.n_ijk(a, i3, b) < tol {
+                                    continue;
+                                }
+                                if m.n_ijk(b, i4, i5) < tol {
+                                    continue;
+                                }
+                                for c in 0..dim {
+                                    if m.n_ijk(i3, i4, c) < tol {
+                                        continue;
+                                    }
+                                    if m.n_ijk(a, c, i5) < tol {
+                                        continue;
+                                    }
+                                    for d in 0..dim {
+                                        if m.n_ijk(i2, c, d) < tol {
+                                            continue;
+                                        }
+                                        if m.n_ijk(i1, d, i5) < tol {
+                                            continue;
+                                        }
+
+                                        let lhs = m
+                                            .f_symbol(i1, i2, c, i5, a, d)
+                                            .times(m.f_symbol(a, i3, i4, i5, b, c));
+
+                                        let mut rhs = C::new(0.0, 0.0);
+                                        for e_idx in 0..dim {
+                                            if m.n_ijk(i2, i3, e_idx) < tol {
+                                                continue;
+                                            }
+                                            if m.n_ijk(i1, e_idx, b) < tol {
+                                                continue;
+                                            }
+                                            if m.n_ijk(e_idx, i4, d) < tol {
+                                                continue;
+                                            }
+
+                                            let term = m
+                                                .f_symbol(i2, i3, i4, d, e_idx, c)
+                                                .times(m.f_symbol(i1, e_idx, i4, i5, b, d))
+                                                .times(m.f_symbol(i1, i2, i3, b, a, e_idx));
+                                            rhs = rhs.plus(term);
+                                        }
+
+                                        if !lhs.close(rhs, tol) {
+                                            return Err(format!("Pentagon equation fails at 1={i1} 2={i2} 3={i3} 4={i4} 5={i5} a={a} b={b} c={c} d={d}"));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Hexagon equations
+    for i1 in 0..dim {
+        for i2 in 0..dim {
+            for i3 in 0..dim {
+                for d in 0..dim {
+                    for a in 0..dim {
+                        if m.n_ijk(i1, i2, a) < tol {
+                            continue;
+                        }
+                        if m.n_ijk(a, i3, d) < tol {
+                            continue;
+                        }
+
+                        for c in 0..dim {
+                            if m.n_ijk(i2, i1, a) < tol {
+                                continue;
+                            }
+                            if m.n_ijk(i1, i3, c) < tol {
+                                continue;
+                            }
+                            if m.n_ijk(i2, c, d) < tol {
+                                continue;
+                            }
+
+                            let lhs1 = m
+                                .r_symbol(i1, i3, c)
+                                .times(m.f_symbol(i2, i1, i3, d, a, c))
+                                .times(m.r_symbol(i1, i2, a));
+
+                            let lhs2 = m
+                                .r_symbol(i3, i1, c)
+                                .conj()
+                                .times(m.f_symbol(i2, i1, i3, d, a, c))
+                                .times(m.r_symbol(i2, i1, a).conj());
+
+                            let mut rhs1 = C::new(0.0, 0.0);
+                            let mut rhs2 = C::new(0.0, 0.0);
+
+                            for b in 0..dim {
+                                if m.n_ijk(i2, i3, b) < tol {
+                                    continue;
+                                }
+                                if m.n_ijk(i1, b, d) < tol {
+                                    continue;
+                                }
+                                if m.n_ijk(b, i1, d) < tol {
+                                    continue;
+                                }
+
+                                let f1 = m.f_symbol(i1, i2, i3, d, a, b);
+                                let f2 = m.f_symbol(i2, i3, i1, d, b, c);
+
+                                rhs1 = rhs1.plus(f2.times(m.r_symbol(i1, b, d)).times(f1));
+                                rhs2 = rhs2.plus(f2.times(m.r_symbol(b, i1, d).conj()).times(f1));
+                            }
+
+                            if !lhs1.close(rhs1, tol) {
+                                return Err(format!(
+                                    "Hexagon 1 fails at 1={i1} 2={i2} 3={i3} d={d} a={a} c={c}"
+                                ));
+                            }
+                            if !lhs2.close(rhs2, tol) {
+                                return Err(format!(
+                                    "Hexagon 2 fails at 1={i1} 2={i2} 3={i3} d={d} a={a} c={c}"
+                                ));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::DoubleZn;
+
+    #[test]
+    fn verify_generalized_mtc_axioms_for_double_zn() {
+        let tol = 1e-9;
+        // Verify for a small double category
+        let d2 = DoubleZn { n: 2 };
+        verify_mtc_axioms(&d2, tol)
+            .unwrap_or_else(|e| panic!("verify_mtc_axioms failed for D(Z_2): {e}"));
+
+        let d3 = DoubleZn { n: 3 };
+        verify_mtc_axioms(&d3, tol)
+            .unwrap_or_else(|e| panic!("verify_mtc_axioms failed for D(Z_3): {e}"));
+    }
 }
