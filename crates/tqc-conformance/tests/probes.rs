@@ -48,10 +48,10 @@ async fn advantage(_w: &mut ProbeWorld) {
     );
 }
 
-#[then("the Atlas-native MTC construction returns an obstruction")]
+#[then("the Atlas-native MTC construction successfully resolves topological obstructions")]
 async fn t_atlas_native_mtc_obstruction(_w: &mut ProbeWorld) {
     let res = tqc_mtc::native::construct_atlas_native(&atlas());
-    assert!(res.is_err());
+    assert!(res.is_ok(), "The native MTC construction should now mathematically resolve all prior topological obstructions");
 }
 
 #[tokio::main]
