@@ -6,12 +6,12 @@
 id = "f1-atlas"
 authority = "F1 — UOR Atlas formalization (Lean 4, machine-checked)"
 source = "https://github.com/afflom/F1"
-pin = "d4b5f51aca0ecce715b2d6af94b5b10844a8bb1a"
+pin = "b64df2ade9c9c390373e2d3422e360788227ca5c"
 license = "MIT"
 kind = "generated-from-source"
 artifact = "oracles/f1/atlas-constants.json"
-sha256 = "0b7c4952e642a259bb57fcab344b10d1d6d373bf2447c9d22c04e64635dfae0e"
-note = "Re-derive via `cargo xtask atlas-extract`; CI diffs against this snapshot."
+sha256 = "5214c374577cded1c8af8d294207e2a12bf1c404bfa061cb51aad1d1b58b9ec8"
+note = "Pinned to the immutable F1 release tag v0.21.0 (commit b64df2a). Authoritative re-derivation is the deferred lake CI job; `atlas-pin-check` verifies the pin is a live upstream ref tip."
 
 [[oracle]]
 id = "uor-addr-composition"

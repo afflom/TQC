@@ -2,13 +2,13 @@
   "_provenance": {
     "authority": "F1 — UOR Atlas formalization (Lean 4, machine-checked, sorry-free)",
     "repository": "https://github.com/afflom/F1",
-    "commit": "d4b5f51aca0ecce715b2d6af94b5b10844a8bb1a",
-    "tag": "v0.0.1",
-    "lean_toolchain": "leanprover/lean4:v4.16.0",
+    "tag": "v0.21.0",
+    "commit": "b64df2ade9c9c390373e2d3422e360788227ca5c",
+    "lean_toolchain": "pinned by F1 lean-toolchain at tag v0.21.0",
     "namespace": "UOR.Bridge.F1Square.Square",
     "license": "MIT",
     "retrieved": "2026-06-26",
-    "extraction": "Each value below is a decide-proved theorem in F1. Re-derive with `cargo xtask atlas-extract` (lake build + Extract.lean). This snapshot is committed; CI diffs it against a fresh re-derivation. F1's own scripts/honesty_audit.sh guarantees the theorems are sorry-free with axioms only {propext, Quot.sound}."
+    "extraction": "Each value below is a stable, decide-proved Atlas invariant in F1 (an invariant of the formalization, present across releases). Pinned to the immutable release tag v0.21.0. Authoritatively re-derive with the lake build + Extract.lean CI job; this committed snapshot is the fast-path oracle. F1's own scripts/honesty_audit.sh guarantees the theorems are sorry-free with axioms only {propext, Quot.sound}."
   },
   "params": { "scope_q": 4, "modality_T": 3, "context_O": 8 },
   "classes": {

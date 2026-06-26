@@ -80,20 +80,27 @@ fn atlas_pin_check() -> Result<()> {
             String::from_utf8_lossy(&out.stderr)
         );
     }
+    // `git ls-remote` lists ref tips as `<sha>\t<ref>`. Require the pin to be a live tip
+    // (line-start match), so the pin must be an immutable tag/branch head — not merely some
+    // historical commit that ls-remote cannot see.
     let listing = String::from_utf8_lossy(&out.stdout);
-    if !listing.contains(o.pin.as_str()) {
-        bail!(
-            "pinned F1 commit {} not found upstream at {}",
+    let tip = listing.lines().find(|l| l.starts_with(o.pin.as_str()));
+    match tip {
+        Some(line) => {
+            let reference = line.split('\t').nth(1).unwrap_or("<unknown ref>");
+            println!(
+                "atlas-pin-check: F1 pin {} is a live upstream tip ({}); artifact digest ok",
+                o.pin, reference
+            );
+            println!("note: authoritative numeric re-derivation (lake build + Extract.lean) is the deferred CI Lean job");
+            Ok(())
+        }
+        None => bail!(
+            "pinned F1 commit {} is not a live ref tip at {} (pin a release tag, not a transient commit)",
             o.pin,
             o.source
-        );
+        ),
     }
-    println!(
-        "atlas-pin-check: F1 commit {} present upstream; artifact digest ok",
-        o.pin
-    );
-    println!("note: full numeric re-derivation (lake build + Extract.lean) runs in the dedicated CI Lean job");
-    Ok(())
 }
 
 /// Run the suite witnesses and emit a conformance ledger.
