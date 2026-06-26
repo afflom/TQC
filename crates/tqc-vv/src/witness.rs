@@ -504,7 +504,10 @@ pub fn holospace_cycle(p: &UseCaseParams) -> Witness {
         }
         tqc_substrate::kappa(&amplitude::encode(&amp_state)).to_string()
     };
-    let apply_gate = |gate_name: &str, targets: &[usize], state_bytes: &[u8]| -> Result<Vec<u8>, String> {
+    let apply_gate = |gate_name: &str,
+                      targets: &[usize],
+                      state_bytes: &[u8]|
+     -> Result<Vec<u8>, String> {
         let exec = tqc_substrate::execute_holo_gate(gate_name, targets, state_bytes)?;
         println!(
             "[holo] provenance record -> gate: {}, params: (scope={}, modality={}, context={}), targets: {:?}, artifact_κ: {}, backend: {}, in_κ: {}, out_κ: {}",
