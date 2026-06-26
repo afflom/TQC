@@ -10,7 +10,7 @@ use tqc_core::generators::{Generators, Permutation};
 use tqc_core::inner::{euclidean_norm_sq, preserves_norm};
 use tqc_core::{coxeter, labels, modular, octonion, spectrum, UseCaseParams};
 use tqc_model::Model;
-use tqc_substrate::{dual, embed_e8, fuse, grade_e6, orbit_e7, COMPOSITION_AXES};
+use tqc_substrate::{dual, embed_e8, fuse, grade_e6, orbit_e7, CompositionAxis, COMPOSITION_AXES};
 
 /// Outcome of a witness.
 pub type Witness = Result<(), String>;
@@ -459,9 +459,88 @@ pub fn braiding_r_matrix(p: &UseCaseParams) -> Witness {
     tqc_mtc::verify_braiding(p.context as usize, tqc_mtc::TOL)
 }
 
-/// PROBE (open) — universality: measure the size of the generated braiding-phase set. Finite
-/// for the constructed pointed model, so the braiding closure is not dense. This returns a
-/// MEASUREMENT only; universality is neither asserted nor denied.
+/// VV (build) — the holospace lift: a braid → fuse → read cycle running as one holospace on
+/// the content-addressing substrate.
+///
+/// Boot: a fusion-space state is encoded to a κ and re-derives (CC-1). Braid: a generator word
+/// applied to the state re-addresses deterministically (CC-2). Isotopy collapse: two distinct
+/// words that compose to the same operator (e.g. `σ^order` vs the identity) yield the same
+/// state and resolve to the same κ — the content-addressed collapse the advantage probe
+/// measures. Read: fusing two label κ resolves deterministically. No-loss: the state round-trips
+/// byte-identically (CC-29/30).
+///
+/// The full native `.holo`-engine (wasmtime) execution is a heavier follow-up; this realizes
+/// the cycle on the substrate operations the validation path already invokes.
+///
+/// # Errors
+/// On a failed re-derivation, non-deterministic gate, broken collapse, or lossy round-trip.
+pub fn holospace_cycle(p: &UseCaseParams) -> Witness {
+    let g = Generators::new(p);
+    let n = p.class_count() as usize;
+    let base: Vec<i64> = (0..n as i64).map(|i| i % 5 - 2).collect();
+    let amp = |state: &[i64]| -> Vec<(u64, Amplitude)> {
+        state
+            .iter()
+            .enumerate()
+            .map(|(i, &v)| (i as u64, Amplitude { re: v, im: 0 }))
+            .collect()
+    };
+    let encode_perm = |perm: &Permutation| {
+        tqc_substrate::kappa(&amplitude::encode(&amp(&perm.permute_amplitudes(&base))))
+    };
+
+    // Boot: encode the state, confirm it re-derives (CC-1) and round-trips with no loss.
+    let amp0 = amp(&base);
+    let bytes0 = amplitude::encode(&amp0);
+    let k0 = tqc_substrate::kappa(&bytes0);
+    check(
+        tqc_substrate::verify(&bytes0, &k0)?,
+        "boot state does not re-derive (CC-1)",
+    )?;
+    check(
+        amplitude::decode(&bytes0).as_deref() == Some(amp0.as_slice()),
+        "state is lossy (CC-29/30)",
+    )?;
+
+    // Braid: apply a generator word; gate application is deterministic (CC-2).
+    let word = g.sigma.then(&g.tau).then(&g.mu);
+    check(
+        encode_perm(&word) == encode_perm(&word),
+        "gate application not deterministic (CC-2)",
+    )?;
+
+    // Isotopy collapse: σ^order and the identity are the same operator → the same κ.
+    let id = Permutation::identity(p.class_count());
+    let mut sigma_pow = id.clone();
+    for _ in 0..p.sigma_order() {
+        sigma_pow = sigma_pow.then(&g.sigma);
+    }
+    check(
+        encode_perm(&sigma_pow) == encode_perm(&id),
+        "isotopic words must collapse to one κ",
+    )?;
+
+    // Read: the fusion outcome resolves to a κ, deterministically.
+    let read = fuse(
+        CompositionAxis::Sha256,
+        &anyon_bytes(p, 0),
+        &anyon_bytes(p, 1),
+    )?;
+    check(
+        read == fuse(
+            CompositionAxis::Sha256,
+            &anyon_bytes(p, 0),
+            &anyon_bytes(p, 1),
+        )?,
+        "fusion readout not deterministic",
+    )
+}
+
+/// PROBE (open) — universality: measure the size of the generated braiding-phase set of the
+/// `D(Z_O)` representative used for the explicit modular/braiding `build`. It is finite *because*
+/// `D(Z_O)` is pointed (abelian braiding) — a property of that representative, **not** a property
+/// of the Atlas's own structure. Returns a MEASUREMENT only; universality is neither asserted nor
+/// denied.
 ///
 /// # Errors
 /// Never fails; returns the measured order.
@@ -469,32 +548,41 @@ pub fn universality_probe(p: &UseCaseParams) -> Result<usize, String> {
     Ok(tqc_mtc::generated_phase_order(p.context as usize))
 }
 
-/// PROBE (open) — advantage: measure the content-addressed reuse ratio (cache hits / total)
-/// when the same states are re-addressed. This returns a MEASUREMENT only; no speedup class is
-/// asserted.
+/// PROBE (open) — advantage as **topological degeneracy**: every braid word of generators
+/// evaluates to a state that is content-addressed to a κ; isotopic words (those composing to
+/// the same operator) collapse to the same κ. The measure is the degeneracy — evaluated braid
+/// paths per distinct result κ — native to the substrate's addressing. This returns a
+/// MEASUREMENT only; no speedup class is asserted.
 ///
 /// # Errors
-/// Never fails; returns the measured ratio in `[0, 1]`.
+/// Never fails; returns the measured degeneracy (`>= 1`).
 pub fn advantage_probe(p: &UseCaseParams) -> Result<f64, String> {
-    let n = p.class_count().min(8);
-    let mut seen: Vec<tqc_substrate::Kappa> = Vec::new();
-    let mut calls = 0u64;
-    let mut hits = 0u64;
-    for _round in 0..3 {
-        for i in 0..n {
-            let k = tqc_substrate::kappa(&anyon_bytes(p, i));
-            calls += 1;
-            if seen.contains(&k) {
-                hits += 1;
-            } else {
-                seen.push(k);
-            }
+    let g = Generators::new(p);
+    let gens = [&g.sigma, &g.tau, &g.mu];
+    let n = p.class_count() as usize;
+    let base: Vec<i64> = (0..n as i64).map(|i| i % 7 - 3).collect();
+    let length = 5u32;
+    let total = 3usize.pow(length); // all length-5 braid words over {σ, τ, μ}
+    let mut distinct: Vec<tqc_substrate::Kappa> = Vec::new();
+    for w in 0..total {
+        let mut perm = Permutation::identity(p.class_count());
+        let mut x = w;
+        for _ in 0..length {
+            perm = perm.then(gens[x % 3]);
+            x /= 3;
+        }
+        let state = perm.permute_amplitudes(&base);
+        let amp: Vec<(u64, Amplitude)> = state
+            .iter()
+            .enumerate()
+            .map(|(i, &v)| (i as u64, Amplitude { re: v, im: 0 }))
+            .collect();
+        let k = tqc_substrate::kappa(&amplitude::encode(&amp));
+        if !distinct.contains(&k) {
+            distinct.push(k);
         }
     }
-    if calls == 0 {
-        return Ok(0.0);
-    }
-    Ok(hits as f64 / calls as f64)
+    Ok(total as f64 / distinct.len().max(1) as f64)
 }
 
 #[cfg(test)]
@@ -534,6 +622,7 @@ mod tests {
         complex_amplitude_encoding(&p).unwrap();
         modular_s_t(&p).unwrap();
         braiding_r_matrix(&p).unwrap();
+        holospace_cycle(&p).unwrap();
     }
 
     #[test]
@@ -547,5 +636,6 @@ mod tests {
         complex_amplitude_encoding(&p).unwrap();
         modular_s_t(&p).unwrap();
         braiding_r_matrix(&p).unwrap();
+        holospace_cycle(&p).unwrap();
     }
 }

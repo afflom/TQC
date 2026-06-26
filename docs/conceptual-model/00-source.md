@@ -87,25 +87,46 @@ with no further assumption.
 - **The whole TQC is a holospace** — a content-addressed compute artifact booted on the same
   peer that runs OS guests and (planned) the LLM, on one fabric.
 
-## Scope: the realized braiding / modular layer
+## The Atlas-native structure, and the one layered build
 
-The braiding R-matrix and modular S/T (the `build` rows) are constructed as the modular data
-of the **quantum double `D(Z_O)`** — `O = context` — an anomaly-free pointed modular tensor
-category. This is a *representative* MTC realized at the Atlas parameters and validated
-against the universal MTC axioms (SL(2,ℤ): `S` symmetric & unitary, `S⁴=1`, `(ST)³=S²`,
-`S²=C`; hexagon; Yang–Baxter; Verlinde). It is **not** asserted to be the Atlas's own braided
-category.
+This TQC is **Atlas-native**, not a category bolted onto an unrelated substrate. The UOR Atlas
+is a single `{T,O}=(3,8)` object with many facets, formalized in F1 (stage G), and it **already
+underpins holospaces**: uor-addr's composition operations are "categorical composition on the
+Atlas image inside E₈", so the κ-address space the substrate runs on *is* the Atlas's addressed
+ground. Almost every row here is a facet of the Atlas itself, reproduced from F1's own theorems
+and validated against them:
 
-Two fusion structures are therefore carried, distinctly and deliberately:
+- objects / classes (`96`), addressing / belt (`12288`) — the Atlas's §2 addressed ground;
+- the reflection generators `σ`/`τ`/`μ` — the Atlas's §3 class transforms (orders `4/8/2`);
+- the inner product `Σxᵢ²` — the Atlas's §9 definite Hurwitz norm (`WeilPSD_rankOne`);
+- fusion `g2` — the Atlas's **composition norm** `|x|²·|y|² = |xy|²`, the 2/4/8-square identity
+  at `C`/`H`/`O` (`AtlasComposition`); dual `f4`, and `e6`/`e7`/`e8` — the categorical
+  composition on the Atlas image inside E₈;
+- the spectrum `{10,7,2,−1}`, the E₈ seed, the modular identities `E₄³=E₆²+1728Δ`, the
+  Coxeter/Weyl data, the coherence laws — the Atlas's §5/§6/§10 facets.
 
-- the **Atlas fusion** `⊗`, realized by `compose_g2_product` (the `fusion-g2` row) — the
-  commutative content-addressed product on the label κ;
-- the **representative MTC fusion** — the group law of `D(Z_O)` underlying its `S`/`T`/`R`.
+The braiding too is realized by the Atlas's *own* generators: a braid word over `σ/τ/μ`
+(exercised by the holospace cycle and the degeneracy probe) is an Atlas-native braid.
 
-These are different categories. Building the Atlas-native braided category — `S`/`T` from the
-θ/Eisenstein modular data, `R` from `σ/τ/μ`, fusion from the `g2` rule, with the MTC axioms
-proved on that identification — is **out of scope** here and recorded as such; the `build`
-rows make no claim to it.
+**One correction.** `g2` is the Atlas's composition *norm*, **not** a fusion ring on the 96
+classes. It composes on the normed-division-algebra tower / the `V_T ⊗ V_O` carrier; asking
+whether it "closes on the classes as simple objects" is a category error — the Atlas defines no
+fusion ring on the classes, and there is nothing there to obstruct.
+
+**The one layered build.** F1 carries no explicit modular-tensor-category *matrices*. The
+`modular-s-t` and `braiding-r-matrix` rows therefore *construct* the explicit `S`/`T`/`R` and
+validate them against the universal MTC axioms (SL(2,ℤ): `S` symmetric & unitary, `S⁴=1`,
+`(ST)³=S²`, `S²=C`; hexagon; Yang–Baxter; Verlinde). The current build realizes them via the
+generic quantum double `D(Z_O)` (`O = context`) — a concrete, anomaly-free pointed MTC that lets
+the axioms be exercised, never claimed to be the Atlas's own category. The Atlas supplies the
+*native data* to build these matrices directly — the modular forms (`AtlasModular`), the
+reflection generators, the E₈ Weyl symmetry (`AtlasCoxeter`), and the 24-dim carrier — and
+deriving the `S`/`T`/`R` from that data, axiom-consistent, is the genuine remaining direction
+(not obstructed, just not yet done). `D(Z_O)` is the stand-in until then.
+
+The Atlas's §9 is explicit that its definite composition norm is a *different object* from the
+signed prime form whose positivity is RH (F1's open crux). The TQC uses only the definite /
+composition / addressing structure; it never touches that crux.
 
 ## Status ledger
 

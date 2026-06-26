@@ -152,6 +152,11 @@ async fn t_braiding(w: &mut TqcWorld) {
     witness::braiding_r_matrix(&w.params()).unwrap();
 }
 
+#[then("the braid-fuse-read holospace cycle runs and round-trips")]
+async fn t_holospace_cycle(w: &mut TqcWorld) {
+    witness::holospace_cycle(&w.params()).unwrap();
+}
+
 #[tokio::main]
 async fn main() {
     let features = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../features/suites");

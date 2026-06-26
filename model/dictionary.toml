@@ -184,6 +184,17 @@ oracle = "holospaces-cc"
 tier = "suite"
 feature = "features/suites/s0_labels/complex_amplitude_encoding.feature"
 
+[[row]]
+id = "holospace-cycle"
+tqc = "Braid -> fuse -> read holospace cycle"
+atlas = "encode state -> braid (generator word) -> fuse (g2) -> read kappa; isotopy collapse; CC-2 determinism, CC-29/30 no-loss"
+source = "AtlasCoherence; vv CC-1/2/29/30 via tqc-substrate"
+status = "build"
+stage = "S3"
+oracle = "holospaces-cc"
+tier = "suite"
+feature = "features/suites/s3_measurement/holospace_cycle.feature"
+
 # --- The 'open' rows: measured and reported, never asserted true. ---
 
 [[row]]

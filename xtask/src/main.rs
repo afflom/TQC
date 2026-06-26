@@ -146,8 +146,8 @@ fn report() -> Result<()> {
     let uni = witness::universality_probe(&p).unwrap_or(0);
     let adv = witness::advantage_probe(&p).unwrap_or(0.0);
     lines.push(format!(
-        "open probes (measured, never asserted): universality braiding-phase order = {uni}; \
-         advantage content-reuse ratio = {adv:.3}\n"
+        "open probes (measured, never asserted): universality D(Z_O) braiding-phase order = {uni}; \
+         advantage topological degeneracy = {adv:.3} braid-paths/κ\n"
     ));
 
     let report = lines.join("\n");
@@ -182,6 +182,7 @@ fn run_suite_witness(
         "complex-amplitude-encoding" => witness::complex_amplitude_encoding(p),
         "modular-s-t" => witness::modular_s_t(p),
         "braiding-r-matrix" => witness::braiding_r_matrix(p),
+        "holospace-cycle" => witness::holospace_cycle(p),
         _ => return None,
     })
 }
