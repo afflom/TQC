@@ -19,8 +19,18 @@ pub trait ModularData {
 }
 
 /// Verify the universal MTC axioms for a generalized Atlas-native category.
-/// This extends the pointed D(Z_n) checks to full F-symbol pentagon and hexagon coherence,
-/// and non-negative integer fusion coefficients.
+///
+/// **Implemented checks:**
+/// - Modular `S` and `T` matrices satisfy SL(2,ℤ) relations (`S` symmetric/unitary, `S⁴ = I`, `(ST)³ = S²`, `S² = C`).
+/// - Fusion coefficients `N_{ij}^k` are non-negative integers.
+///
+/// **Stubbed checks (represented only by trait signatures):**
+/// - Full `F`-symbol pentagon coherence.
+/// - Full hexagon coherence for `F` and `R`.
+/// - Yang–Baxter coverage and monodromy consistency for general non-pointed MTCs.
+/// - Full nonnegative integral Verlinde fusion checks linking `S` to `N_{ij}^k`.
+///
+/// *Note:* The pointed `D(Z_n)` specialization (in `lib.rs`) implements its own specialized checks for the hexagon, Yang-Baxter, and Verlinde formula that are not verified here for arbitrary non-pointed categories.
 ///
 /// # Errors
 /// Returns a description of the first axiom that fails within `tol`.

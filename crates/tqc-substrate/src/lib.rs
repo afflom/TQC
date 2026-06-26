@@ -17,6 +17,10 @@ pub use holospaces::Kappa;
 use uor_addr::codemodule;
 use uor_addr::composition as comp;
 
+/// Dynamic execution of gates as `.holo` artifacts.
+pub mod holo;
+pub use holo::execute_holo_gate;
+
 /// Address canonical bytes to a content κ on the default (Blake3) axis (holospaces).
 #[must_use]
 pub fn kappa(canonical_bytes: &[u8]) -> Kappa {

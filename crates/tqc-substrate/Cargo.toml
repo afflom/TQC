@@ -17,9 +17,13 @@ publish = false
 # content-addressing core (no wasmtime engine), which is all the facade needs today.
 holospaces = { git = "https://github.com/Hologram-Technologies/holospaces", rev = "f2415624e3a37162d9a30b4dbae776dcebb60e3e", default-features = true }
 hologram-exec = { git = "https://github.com/Hologram-Technologies/hologram", rev = "18f553d8578997ce32e7b653786a0bcf9b09a2c0" }
+hologram-compiler = { git = "https://github.com/Hologram-Technologies/hologram", rev = "18f553d8578997ce32e7b653786a0bcf9b09a2c0" }
 hologram-archive = { git = "https://github.com/Hologram-Technologies/hologram", rev = "18f553d8578997ce32e7b653786a0bcf9b09a2c0" }
 hologram-graph = { git = "https://github.com/Hologram-Technologies/hologram", rev = "18f553d8578997ce32e7b653786a0bcf9b09a2c0" }
 hologram-backend = { git = "https://github.com/Hologram-Technologies/hologram", rev = "18f553d8578997ce32e7b653786a0bcf9b09a2c0" }
+hologram-ops = { git = "https://github.com/Hologram-Technologies/hologram", rev = "18f553d8578997ce32e7b653786a0bcf9b09a2c0" }
+uor-foundation = "0.5.2"
+smallvec = "1.11"
 uor-addr = "0.2.0"
 tqc-core = { workspace = true }
 tqc-model = { workspace = true }

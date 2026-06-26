@@ -485,8 +485,31 @@ pub fn holospace_cycle(p: &UseCaseParams) -> Witness {
             .map(|(i, &v)| (i as u64, Amplitude { re: v, im: 0 }))
             .collect()
     };
-    let encode_perm = |perm: &Permutation| {
-        tqc_substrate::kappa(&amplitude::encode(&amp(&perm.permute_amplitudes(&base))))
+    let encode_binary = |amplitudes: &[(u64, Amplitude)]| -> Vec<u8> {
+        let mut v = vec![0i64; (p.class_count() * 2) as usize];
+        for &(l, a) in amplitudes {
+            let l = l as usize;
+            v[l * 2] = a.re;
+            v[l * 2 + 1] = a.im;
+        }
+        v.iter().flat_map(|x| x.to_le_bytes()).collect()
+    };
+    let decode_binary_to_kappa = |bytes: &[u8]| -> String {
+        let mut amp_state = Vec::new();
+        for (i, chunk) in bytes.chunks_exact(16).enumerate() {
+            let re = i64::from_le_bytes(chunk[0..8].try_into().unwrap_or([0; 8]));
+            let im = i64::from_le_bytes(chunk[8..16].try_into().unwrap_or([0; 8]));
+            amp_state.push((i as u64, Amplitude { re, im }));
+        }
+        tqc_substrate::kappa(&amplitude::encode(&amp_state)).to_string()
+    };
+    let apply_gate = |targets: &[usize], state_bytes: &[u8]| -> Result<Vec<u8>, String> {
+        tqc_substrate::execute_holo_gate(targets, state_bytes)
+    };
+    let get_targets = |perm: &Permutation| -> Vec<usize> {
+        (0..p.class_count())
+            .map(|i| perm.apply(i) as usize)
+            .collect()
     };
 
     // Boot: encode the state, confirm it re-derives (CC-1) and round-trips with no loss.
@@ -503,22 +526,29 @@ pub fn holospace_cycle(p: &UseCaseParams) -> Witness {
     )?;
 
     // Braid: apply a generator word; gate application is deterministic (CC-2).
-    let word = g.sigma.then(&g.tau).then(&g.mu);
+    let bin0 = encode_binary(&amp0);
+    let st_sigma = apply_gate(&get_targets(&g.sigma), &bin0)?;
+    let st_tau = apply_gate(&get_targets(&g.tau), &st_sigma)?;
+    let st_mu = apply_gate(&get_targets(&g.mu), &st_tau)?;
+    let k_word = decode_binary_to_kappa(&st_mu);
+
+    let st_sigma_2 = apply_gate(&get_targets(&g.sigma), &bin0)?;
+    let st_tau_2 = apply_gate(&get_targets(&g.tau), &st_sigma_2)?;
+    let st_mu_2 = apply_gate(&get_targets(&g.mu), &st_tau_2)?;
+    let k_word_2 = decode_binary_to_kappa(&st_mu_2);
     check(
-        encode_perm(&word) == encode_perm(&word),
+        k_word == k_word_2,
         "gate application not deterministic (CC-2)",
     )?;
 
     // Isotopy collapse: σ^order and the identity are the same operator → the same κ.
-    let id = Permutation::identity(p.class_count());
-    let mut sigma_pow = id.clone();
+    let mut st_pow = bin0.clone();
     for _ in 0..p.sigma_order() {
-        sigma_pow = sigma_pow.then(&g.sigma);
+        st_pow = apply_gate(&get_targets(&g.sigma), &st_pow)?;
     }
-    check(
-        encode_perm(&sigma_pow) == encode_perm(&id),
-        "isotopic words must collapse to one κ",
-    )?;
+    let k_pow = decode_binary_to_kappa(&st_pow);
+    let k_id = decode_binary_to_kappa(&bin0);
+    check(k_pow == k_id, "isotopic words must collapse to one κ")?;
 
     // Read: the fusion outcome resolves to a κ, deterministically.
     let read = fuse(
