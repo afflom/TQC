@@ -27,11 +27,14 @@ fn atlas() -> tqc_core::UseCaseParams {
 #[then("the generated-subgroup density is measured and universality remains open and unasserted")]
 async fn universality(_w: &mut ProbeWorld) {
     let result = witness::universality_probe(&atlas()).unwrap();
-    println!("[probe] universality: {result}");
-    assert!(
-        !result.is_empty(),
-        "a measurement or obstruction must be produced"
+    println!("[probe] universality: {}", result.description);
+    println!(
+        "  - Orbit type: {}",
+        if result.is_dense { "Dense" } else { "Finite" }
     );
+    if !result.is_dense {
+        println!("  - Unique phases: {}", result.unique_phases);
+    }
 }
 
 #[then("the topological degeneracy is measured and advantage remains open and unasserted")]

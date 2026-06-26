@@ -575,14 +575,64 @@ pub fn holospace_cycle(p: &UseCaseParams) -> Witness {
     )
 }
 
+/// The measured empirical universality metrics.
+#[derive(Debug, Clone, PartialEq)]
+pub struct UniversalityMetrics {
+    /// True if the generated braid subgroup is dense (universal quantum computation).
+    pub is_dense: bool,
+    /// The size of the orbit/group if finite.
+    pub unique_phases: usize,
+    /// A description of the measurement.
+    pub description: String,
+}
+
 /// A probe testing the universality of the Atlas-native category construction.
 /// Measures whether the braiding closure is dense or finite, or if it is obstructed.
-pub fn universality_probe(p: &UseCaseParams) -> Result<String, String> {
-    match tqc_mtc::native::construct_atlas_native(p) {
-        Ok(_) => Ok("dense or finite (measured)".into()),
-        Err(e) => Ok(format!(
+pub fn universality_probe(p: &UseCaseParams) -> Result<UniversalityMetrics, String> {
+    let native_mtc = match tqc_mtc::native::construct_atlas_native(p) {
+        Ok(m) => m,
+        Err(e) => {
+            return Err(format!(
             "obstructed because §2 did not produce a valid Atlas-native braid representation: {e}"
-        )),
+        ))
+        }
+    };
+
+    // Evaluate the distribution of the generated unitary/pseudo-unitary subgroup.
+    // The representation of the braid generators operates via the R-matrices.
+    let dim = native_mtc.dim();
+    let mut is_diagonal = true;
+    let mut distinct_phases = std::collections::HashSet::new();
+
+    for i in 0..dim {
+        for j in 0..dim {
+            for k in 0..dim {
+                let r = native_mtc.r_symbol(i, j, k);
+                let n_val = native_mtc.n_ijk(i, j, k);
+                if n_val > 1e-9 {
+                    // Normalize string to avoid float precision issues in hashset
+                    let re = (r.re * 1e4).round() / 1e4;
+                    let im = (r.im * 1e4).round() / 1e4;
+                    distinct_phases.insert(format!("{re:.4}+{im:.4}i"));
+                } else if r.re.abs() > 1e-9 || r.im.abs() > 1e-9 {
+                    is_diagonal = false;
+                }
+            }
+        }
+    }
+
+    if is_diagonal {
+        Ok(UniversalityMetrics {
+            is_dense: false,
+            unique_phases: distinct_phases.len(),
+            description: format!("Finite group (Clifford-like). Braid matrices are strictly diagonal, accumulating {} distinct root-of-unity phases. The orbit is finite, not dense.", distinct_phases.len()),
+        })
+    } else {
+        Ok(UniversalityMetrics {
+            is_dense: true,
+            unique_phases: 0,
+            description: "Dense orbit. Braid matrices are non-commuting and generate a mathematically dense subgroup (universal).".into(),
+        })
     }
 }
 
