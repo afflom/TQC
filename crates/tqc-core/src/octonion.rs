@@ -31,10 +31,12 @@ pub fn cd_mul(a: &[i128], b: &[i128]) -> Vec<i128> {
     let h = n / 2;
     let (a1, a2) = a.split_at(h);
     let (b1, b2) = b.split_at(h);
-    let zip_sub =
-        |x: &[i128], y: &[i128]| -> Vec<i128> { x.iter().zip(y).map(|(p, q)| p.saturating_sub(*q)).collect() };
-    let zip_add =
-        |x: &[i128], y: &[i128]| -> Vec<i128> { x.iter().zip(y).map(|(p, q)| p.saturating_add(*q)).collect() };
+    let zip_sub = |x: &[i128], y: &[i128]| -> Vec<i128> {
+        x.iter().zip(y).map(|(p, q)| p.saturating_sub(*q)).collect()
+    };
+    let zip_add = |x: &[i128], y: &[i128]| -> Vec<i128> {
+        x.iter().zip(y).map(|(p, q)| p.saturating_add(*q)).collect()
+    };
     let first = zip_sub(&cd_mul(a1, b1), &cd_mul(&conj(b2), a2));
     let second = zip_add(&cd_mul(b2, a1), &cd_mul(a2, &conj(b1)));
     let mut out = first;
