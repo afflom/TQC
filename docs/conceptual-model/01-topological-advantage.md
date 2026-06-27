@@ -1,37 +1,27 @@
-# 01 Topological Advantage & Cache Collapse
+# 01 Topological Advantage: Content-Addressed Degeneracy
 
-The classical emulation of quantum mechanics is fundamentally capped by the exponential memory demands of state-vector representations. To fully track $n$ entangled qubits, a classical computer must maintain a dense matrix of size $O(2^n)$ in memory. This means an emulator reaches absolute physical limits very quickly. By 50-60 qubits, the memory bounds exceed the capabilities of global supercomputers; by ~300 qubits, the size of the required memory vector exceeds the number of atoms in the visible universe.
+The substrate's measured computational advantage is **topological degeneracy via UOR cache-collapse**.
 
-Holospaces bypasses this computational wall via the **Topological Cache-Collapse** advantage, natively enabled by the `tqc-substrate` Universal Object Reference (UOR) addressing and the `AtlasNative` Categorical construction.
+When evaluating braids, isotopic generator words (distinct paths that compose to the same topological operator) evaluate to the same quantum state. Rather than tracking an exponentially growing tree of paths, Holospaces hashes each evaluated state to a `κ` address via its Universal Object Reference (UOR) addressing. Because multiple paths collapse to the identical `κ`, the physical hardware (L1/L2/L3 caches) naturally absorbs the degeneracy.
 
-## Mechanisms of Cache-Collapse
+This is a real, measurable efficiency for computations that carry topological degeneracy.
 
-Topological quantum computations using the MTC structures defined in the Uniform Orbifold Representation (UOR) do not act on continuously parameterized complex floats. Instead, the algebraic structures are constrained, definite, and universally addressable. 
+## The Finite-Image Plateau vs Universal Computation
 
-This enables scaling by fundamentally altering how quantum states are stored:
+It is critical to bound this claim: **this is not a general exponential speedup over classical simulation of arbitrary $N$-qubit circuits.**
 
-1. **Deterministic Fusion over Probability Vectors**
-   In a traditional tensor state representation, entangling two states forms a superposition of their bases. Under the algebraic rules of the pseudo-unitary UOR (the $Z_3 \times Z_2^3$ algebraic quotient), any two anyons fuse to yield exactly **one definite representation vector** governed by $N_{ij}^k$. Consequently, topological operations are naturally sparse and heavily constrained.
-   
-2. **Topological Invariance over Noise**
-   Instead of constantly adjusting continuous 64-bit complex float parameters via matrix multiplication, Holospace emulation calculates the finite phase relations resulting from braiding ($R$-matrix) and topological twisting ($\theta$). The result of generating braids operates effectively on finite, Clifford-like dense orbits, requiring deterministic structural derivations rather than approximations over $\mathbb{C}$.
+A generic, dense $N$-qubit quantum circuit has no structural repetition; it visits $O(2^N)$ unique states and thus costs classical substrates exactly what state-vector simulation costs. The content-addressed elision efficiency applies strictly to computations living within a finite image (e.g., the pointed abelian MTC, or topological workloads rich in isotopy). Because a finite group cannot represent arbitrary continuous $2^N$ states, this plateau represents finite closure evaluation—not universal $N$-qubit supremacy.
 
-3. **Universal Object Reference ($\kappa$-Addressing)**
-   The `tqc-substrate` acts as a pure mathematical dictionary. Every evaluated topological state collapses into a byte-sequence that is universally hashed (e.g., Blake3 `κ`). 
-   - When thousands of topologically equivalent sub-braids evaluate, they evaluate to identical bytes.
-   - The substrate deduplicates these states in real time.
-   - Instead of duplicating a massive string of data into RAM, the software strictly stores a single copy, effectively achieving a $O(1)$ memory constraint for mathematically identical pathways.
+## Empirical Benchmark: The Degeneracy Plateau
 
-## Empirical Benchmark
+A scaling trace executed at deep braiding networks over the generators $\{\sigma, \tau, \mu\}$ yields exactly this cache-collapse advantage when operating over a finite orbit.
 
-A scaling trace executed at deep braiding networks over the non-commuting generators $\{\sigma, \tau, \mu\}$ yields exactly this cache-collapse advantage.
+| Braid Depth | Total Paths | Distinct Operators ($\kappa$) | Cache Hit Elision % |
+|-------------|-------------|-------------------------------|---------------------|
+| 2           | 9           | 9                             | 0.00%               |
+| 4           | 81          | 27                            | 66.67%              |
+| 6           | 729         | 32                            | 95.61%              |
+| 8           | 6,561       | 32                            | 99.51%              |
+| 10          | 59,049      | 32                            | 99.95%              |
 
-| Braid Depth | Distinct Paths | Classical V-RAM Expectation | Holospace $\kappa$-RAM | Substrate Cache Hit % |
-|-------------|----------------|-----------------------------|------------------------|-----------------------|
-| 2           | 9              | ~0.01 MB                    | ~4.50 KB               | 33.33%                |
-| 4           | 81             | ~0.06 MB                    | ~10.50 KB              | 82.72%                |
-| 6           | 729            | ~0.53 MB                    | ~16.50 KB              | 96.98%                |
-| 8           | 6,561          | ~4.81 MB                    | ~21.75 KB              | 99.56%                |
-| 10          | 59,049         | ~43.25 MB                   | ~24.00 KB              | 99.95%                |
-
-*The plateau of unique `κ` addresses (at 32 states for the tested pseudo-metric parameter) demonstrates a pure finite invariant closure. As the evaluation scales beyond $N=10$, classical emulation grows exponentially, while Holospace evaluations perfectly flat-line the hardware cache demand, demonstrating true scalability for TQC algorithmic execution.*
+*The plateau of unique `κ` addresses (at 32 distinct states in this specific finite orbit) demonstrates the closure of the group image. As the evaluation scales beyond $N=6$, the number of possible combinatorial paths grows exponentially, while the topological evaluations perfectly flat-line in memory due to content deduplication. This content-addressed elision provides significant performance multipliers specifically for workloads possessing deep topological repetition.*

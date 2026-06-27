@@ -597,14 +597,9 @@ pub struct UniversalityMetrics {
 /// A probe testing the universality of the Atlas-native category construction.
 /// Measures whether the braiding closure is dense or finite, or if it is obstructed.
 pub fn universality_probe(p: &UseCaseParams) -> Result<UniversalityMetrics, String> {
-    let native_mtc = match tqc_mtc::native::construct_atlas_native(p) {
-        Ok(m) => m,
-        Err(e) => {
-            return Err(format!(
-            "obstructed because §2 did not produce a valid Atlas-native braid representation: {e}"
-        ))
-        }
-    };
+    // C.1 The infinite-and-irreducible test must be run on the non-pointed braiding.
+    // We instantiate the non-pointed category, which keeps the signs the absolute quotient discards.
+    let native_mtc = tqc_mtc::native::construct_atlas_native_non_pointed(p);
 
     // Evaluate the distribution of the generated unitary/pseudo-unitary subgroup.
     // The representation of the braid generators operates via the R-matrices.
@@ -635,6 +630,10 @@ pub fn universality_probe(p: &UseCaseParams) -> Result<UniversalityMetrics, Stri
         }
     }
 
+    // A.5 Calibration: non-diagonality does not imply density.
+    // The image must be both infinite and irreducible (Freedman-Larsen-Wang).
+    // Until the infinite-and-irreducible test (§C) is built and passed on a non-pointed category,
+    // density is strictly unproven (open).
     if is_diagonal {
         Ok(UniversalityMetrics {
             is_dense: false,
@@ -643,9 +642,9 @@ pub fn universality_probe(p: &UseCaseParams) -> Result<UniversalityMetrics, Stri
         })
     } else {
         Ok(UniversalityMetrics {
-            is_dense: true,
-            unique_phases: 0,
-            description: "Dense orbit. Braid matrices are non-commuting and generate a mathematically dense subgroup (universal).".into(),
+            is_dense: false, // Must be explicitly measured as infinite+irreducible in §C to be true.
+            unique_phases: distinct_phases.len(),
+            description: "Non-diagonal braiding measured. Density (universality) remains OPEN until the infinite-and-irreducible test is passed.".into(),
         })
     }
 }

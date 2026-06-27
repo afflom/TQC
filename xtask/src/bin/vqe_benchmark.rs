@@ -10,11 +10,11 @@ fn main() {
     let p = canonical(&model).unwrap();
 
     println!("=======================================================");
-    println!(" Holospaces Atlas-Native Variational Quantum Eigensolver");
+    println!(" Holospaces Finite-Closure Variational Quantum Eigensolver");
     println!("=======================================================");
     println!("End-to-end Classical to Topological optimization loop.");
     println!("Synthesizing parameterized classical gates (Ry, Rz) via");
-    println!("Solovay-Kitaev epsilon-net weaving into native Braid Words.");
+    println!("exact evaluation over the finite closure.");
     println!();
 
     let ansatz = Ansatz {

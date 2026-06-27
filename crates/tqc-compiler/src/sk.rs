@@ -19,12 +19,14 @@ pub struct NetNode {
 /// A simplified Solovay-Kitaev Weaver for SU(2) fractional rotations.
 pub struct SkWeaver {
     epsilon_net: Vec<NetNode>,
+    /// Whether the underlying group is dense (universality established).
+    pub is_dense: bool,
 }
 
 impl SkWeaver {
     /// Initializes a generic epsilon net covering the dense class space.
     #[must_use]
-    pub fn new() -> Self {
+    pub fn new(is_dense: bool) -> Self {
         // In a true implementation, this net is generated recursively via
         // Group Commutators of the primary Sigma, Tau, Mu generators.
         // We synthesize a representative static epsilon net covering [0, 2PI].
@@ -57,7 +59,10 @@ impl SkWeaver {
             phase_angle: pi / 8.0,
         });
 
-        Self { epsilon_net: net }
+        Self {
+            epsilon_net: net,
+            is_dense,
+        }
     }
 
     /// Synthesizes an arbitrary rotation `theta` into a discrete Braid Word
@@ -71,6 +76,17 @@ impl SkWeaver {
         let mut target = theta % (2.0 * core::f64::consts::PI);
         if target < 0.0 {
             target += 2.0 * core::f64::consts::PI;
+        }
+
+        // A.4 Calibration: SK approximation is undefined over a finite (non-dense) group.
+        // Until density is established, we only permit exact topological phases.
+        if !self.is_dense {
+            for node in &self.epsilon_net {
+                if (node.phase_angle - target).abs() < epsilon {
+                    return Ok(node.word.clone());
+                }
+            }
+            return Err("SK synthesis requires a dense group to approximate arbitrary fractional rotations. Universality is currently OPEN. Only exact discrete phases are supported.".into());
         }
 
         let mut sequence = Vec::new();
@@ -114,6 +130,6 @@ impl SkWeaver {
 
 impl Default for SkWeaver {
     fn default() -> Self {
-        Self::new()
+        Self::new(false)
     }
 }

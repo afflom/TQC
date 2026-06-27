@@ -3,6 +3,7 @@
 
 use std::time::Instant;
 use tqc_atlas::canonical;
+use tqc_compiler::{BraidGen, Compiler, LogicGate};
 use tqc_core::amplitude::{self, Amplitude};
 use tqc_core::generators::{Generators, Permutation};
 use tqc_model::Model;
@@ -11,36 +12,63 @@ fn main() {
     let model = Model::load().unwrap();
     let p = canonical(&model).unwrap();
     let g = Generators::new(&p);
-    let gens = [&g.sigma, &g.tau, &g.mu];
+    let compiler = Compiler::new(&p);
     let n = p.class_count() as usize;
     let base: Vec<i64> = (0..n as i64).map(|i| i % 7 - 3).collect();
 
     println!("=======================================================");
-    println!(" Holospaces / Atlas-Native Megascale Qubit Emulation");
+    println!(" Holospaces / Content-Addressed Degeneracy Benchmark");
     println!("=======================================================");
-    println!("Demonstrating topological advantage on >1000 virtual qubits.");
-    println!("Mapping N-qubit circuits to poly(N) topological braid words.");
+    println!("Demonstrating topological degeneracy via UOR cache-collapse.");
+    println!("This measures elision efficiency on finite-closure workloads,");
+    println!("NOT universal N-qubit supremacy.");
     println!();
 
-    let qubit_scales = [10, 50, 100, 500, 1000, 5000, 10000];
+    let qubit_scales = [10, 50, 100, 500, 1000];
 
     for &qubits in &qubit_scales {
-        let braid_depth = qubits * 10; // Synthetic depth polynomial in N
+        let depth = qubits * 2;
         let start = Instant::now();
 
-        // Execute the deep braid word representing the N-qubit circuit
-        let mut perm = Permutation::identity(p.class_count());
-
-        // Use a deterministic pseudo-random sequence to simulate a dense compiled circuit
-        for step in 0..braid_depth {
-            // A pseudo-random mix of generators simulating dense braiding
-            let gen_idx = (step * 17 + qubits * 31) % 3;
-            perm = perm.then(gens[gen_idx as usize]);
+        // Generate a real circuit that has topological degeneracy
+        let mut circuit = Vec::new();
+        for q in 0..qubits {
+            circuit.push(LogicGate::Hadamard(q));
+            circuit.push(LogicGate::TGate(q));
+            if q > 0 {
+                circuit.push(LogicGate::CNot(q - 1, q));
+            }
         }
 
-        // Apply the collapsed braid operator to the base state
-        let state = perm.permute_amplitudes(&base);
-        let amp: Vec<(u64, Amplitude)> = state
+        // Compile the circuit to a topological braid word
+        let word = compiler.compile(&circuit).unwrap();
+        let braid_depth = word.sequence.len();
+
+        let mut perm = Permutation::identity(p.class_count());
+        let mut distinct_states = std::collections::HashSet::new();
+
+        // Execute the compiled word and track distinct intermediate states
+        for gen in &word.sequence {
+            let p_gen = match gen {
+                BraidGen::Sigma => &g.sigma,
+                BraidGen::Tau => &g.tau,
+                BraidGen::Mu => &g.mu,
+            };
+            perm = perm.then(p_gen);
+
+            let current_state = perm.permute_amplitudes(&base);
+            let amp: Vec<(u64, Amplitude)> = current_state
+                .iter()
+                .enumerate()
+                .map(|(i, &v)| (i as u64, Amplitude { re: v, im: 0 }))
+                .collect();
+            let k = tqc_substrate::kappa(&amplitude::encode(&amp)).to_string();
+            distinct_states.insert(k);
+        }
+
+        // Apply the collapsed braid operator to the base state (already permuted above, so just track the final k)
+        let final_state = perm.permute_amplitudes(&base);
+        let amp: Vec<(u64, Amplitude)> = final_state
             .iter()
             .enumerate()
             .map(|(i, &v)| (i as u64, Amplitude { re: v, im: 0 }))
@@ -50,8 +78,10 @@ fn main() {
         let k = tqc_substrate::kappa(&amplitude::encode(&amp)).to_string();
         let elapsed = start.elapsed();
 
-        // Classical state vector memory for N qubits is 2^N * 16 bytes
-        // For N > 50, this exceeds all computers on Earth.
+        let total_paths = braid_depth;
+        let unique = distinct_states.len().max(1);
+        let elision_ratio = total_paths as f64 / unique as f64;
+
         let classical_mem = if qubits <= 30 {
             format!(
                 "{:.2} GB",
@@ -64,6 +94,14 @@ fn main() {
         println!(
             "Virtual Qubits: {:<6} | Braid Depth: {:<6}",
             qubits, braid_depth
+        );
+        println!(
+            "  ├─ Expressibility:      Compiled valid circuit (depth {})",
+            depth
+        );
+        println!(
+            "  ├─ Elision Ratio:       {:.2}x ({} evaluated / {} unique)",
+            elision_ratio, total_paths, unique
         );
         println!("  ├─ Final State UOR (κ): {}", k);
         println!("  ├─ Classical Memory:    {}", classical_mem);
