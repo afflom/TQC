@@ -7,7 +7,7 @@
 use alloc::vec::Vec;
 
 fn neg(a: &[i128]) -> Vec<i128> {
-    a.iter().map(|x| -x).collect()
+    a.iter().map(|x| x.saturating_neg()).collect()
 }
 
 /// Cayley–Dickson conjugation: negate the imaginary part recursively.
@@ -26,15 +26,15 @@ fn conj(a: &[i128]) -> Vec<i128> {
 pub fn cd_mul(a: &[i128], b: &[i128]) -> Vec<i128> {
     let n = a.len();
     if n == 1 {
-        return alloc::vec![a[0] * b[0]];
+        return alloc::vec![a[0].saturating_mul(b[0])];
     }
     let h = n / 2;
     let (a1, a2) = a.split_at(h);
     let (b1, b2) = b.split_at(h);
     let zip_sub =
-        |x: &[i128], y: &[i128]| -> Vec<i128> { x.iter().zip(y).map(|(p, q)| p - q).collect() };
+        |x: &[i128], y: &[i128]| -> Vec<i128> { x.iter().zip(y).map(|(p, q)| p.saturating_sub(*q)).collect() };
     let zip_add =
-        |x: &[i128], y: &[i128]| -> Vec<i128> { x.iter().zip(y).map(|(p, q)| p + q).collect() };
+        |x: &[i128], y: &[i128]| -> Vec<i128> { x.iter().zip(y).map(|(p, q)| p.saturating_add(*q)).collect() };
     let first = zip_sub(&cd_mul(a1, b1), &cd_mul(&conj(b2), a2));
     let second = zip_add(&cd_mul(b2, a1), &cd_mul(a2, &conj(b1)));
     let mut out = first;
@@ -68,8 +68,10 @@ pub fn structure_constants(dim: usize) -> Vec<(usize, usize, usize, i128)> {
 
 /// The norm `Σxᵢ²`.
 #[must_use]
-pub fn norm_sq(a: &[i128]) -> i128 {
-    a.iter().map(|x| x * x).sum()
+pub fn norm_sq(a: &[i128]) -> u128 {
+    a.iter().fold(0u128, |acc, &x| {
+        acc.saturating_add(x.unsigned_abs().saturating_pow(2))
+    })
 }
 
 /// Whether the composition norm is multiplicative at this dimension: `N(a)·N(b) = N(a·b)`.

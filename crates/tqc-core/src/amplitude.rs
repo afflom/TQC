@@ -53,11 +53,12 @@ pub fn decode(bytes: &[u8]) -> Option<Vec<(u64, Amplitude)>> {
 
 /// The Euclidean composition norm `Σ|cᵢ|² = Σ(reᵢ² + imᵢ²)`.
 #[must_use]
-pub fn norm_sq(state: &[(u64, Amplitude)]) -> i128 {
-    state
-        .iter()
-        .map(|(_, a)| i128::from(a.re) * i128::from(a.re) + i128::from(a.im) * i128::from(a.im))
-        .sum()
+pub fn norm_sq(state: &[(u64, Amplitude)]) -> u128 {
+    state.iter().fold(0u128, |acc, (_, a)| {
+        let re_sq = (a.re.unsigned_abs() as u128).saturating_pow(2);
+        let im_sq = (a.im.unsigned_abs() as u128).saturating_pow(2);
+        acc.saturating_add(re_sq.saturating_add(im_sq))
+    })
 }
 
 #[cfg(test)]

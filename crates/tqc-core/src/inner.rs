@@ -8,8 +8,10 @@ use crate::generators::Permutation;
 
 /// `Σxᵢ²`, computed exactly in `i128` to avoid overflow and floating point.
 #[must_use]
-pub fn euclidean_norm_sq(v: &[i64]) -> i128 {
-    v.iter().map(|&x| i128::from(x) * i128::from(x)).sum()
+pub fn euclidean_norm_sq(v: &[i64]) -> u128 {
+    v.iter().fold(0u128, |acc, &x| {
+        acc.saturating_add((x.unsigned_abs() as u128).saturating_pow(2))
+    })
 }
 
 /// Whether a permutation preserves `Σxᵢ²` on a given amplitude vector (orthogonality).
