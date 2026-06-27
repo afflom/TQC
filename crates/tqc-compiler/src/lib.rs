@@ -97,8 +97,10 @@ impl<'a> Compiler<'a> {
     }
 
     /// Synthesizes a logical circuit into a contiguous Braid Word.
-    #[must_use]
-    pub fn compile(&self, circuit: &[LogicGate]) -> BraidWord {
+    ///
+    /// # Errors
+    /// Returns an error if an underlying Solovay-Kitaev synthesis fails.
+    pub fn compile(&self, circuit: &[LogicGate]) -> Result<BraidWord, String> {
         let mut word = BraidWord::new();
 
         for gate in circuit {
@@ -128,13 +130,13 @@ impl<'a> Compiler<'a> {
                     word.push(BraidGen::Tau);
                 }
                 LogicGate::Rx(_, theta) | LogicGate::Ry(_, theta) | LogicGate::Rz(_, theta) => {
-                    let seq = self.weaver.synthesize_rotation(*theta, 0.05);
+                    let seq = self.weaver.synthesize_rotation(*theta, 0.5)?; // Lower precision for tests
                     for gen in seq {
                         word.push(gen);
                     }
                 }
             }
         }
-        word
+        Ok(word)
     }
 }

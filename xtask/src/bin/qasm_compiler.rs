@@ -36,11 +36,11 @@ fn main() {
     println!("Input OpenQASM:");
     println!("{}", qasm_source);
 
-    let logic_gates = QasmParser::parse(qasm_source);
+    let logic_gates = QasmParser::parse(qasm_source).unwrap();
     println!("Parsed Logical Circuit: {:?}", logic_gates);
 
     let compiler = Compiler::new(&p);
-    let braid_word = compiler.compile(&logic_gates);
+    let braid_word = compiler.compile(&logic_gates).unwrap();
 
     println!(
         "Synthesized Topological Braid Word Length: {}",

@@ -62,8 +62,12 @@ impl SkWeaver {
 
     /// Synthesizes an arbitrary rotation `theta` into a discrete Braid Word
     /// that approximates the rotation within `epsilon` bounds.
-    #[must_use]
-    pub fn synthesize_rotation(&self, theta: f64, epsilon: f64) -> Vec<BraidGen> {
+    ///
+    /// # Errors
+    ///
+    /// Returns `CompileError` if the synthesis cannot reach the target `epsilon`
+    /// precision within the maximum allowed depth.
+    pub fn synthesize_rotation(&self, theta: f64, epsilon: f64) -> Result<Vec<BraidGen>, String> {
         let mut target = theta % (2.0 * core::f64::consts::PI);
         if target < 0.0 {
             target += 2.0 * core::f64::consts::PI;
@@ -76,7 +80,7 @@ impl SkWeaver {
         for _ in 0..10 {
             // Max depth
             if (current_phase - target).abs() < epsilon {
-                break;
+                return Ok(sequence);
             }
 
             // Find the node in the epsilon-net that minimizes the residual gap
@@ -96,7 +100,15 @@ impl SkWeaver {
             current_phase = (current_phase + best_node.phase_angle) % (2.0 * core::f64::consts::PI);
         }
 
-        sequence
+        if (current_phase - target).abs() < epsilon {
+            Ok(sequence)
+        } else {
+            Err(format!(
+                "SK Synthesis failed to converge within epsilon {} (residual gap: {})",
+                epsilon,
+                (current_phase - target).abs()
+            ))
+        }
     }
 }
 

@@ -32,11 +32,13 @@ fn main() {
         "Ansatz: {} qubits, {} layers, {} parameters",
         ansatz.num_qubits, ansatz.layers, num_params
     );
-    let initial_energy = solver.evaluate_energy(&ansatz, &initial_thetas);
-    println!("Initial Energy: {:.4}", initial_energy);
+    // 4. Initial evaluation
+    let initial_energy = solver.evaluate_energy(&ansatz, &initial_thetas).unwrap();
+    println!("Initial State Energy: {:.4}", initial_energy);
 
-    // Run 10 optimization steps
-    let (optimized_thetas, final_energy) = solver.optimize(&ansatz, &initial_thetas, 10);
+    // 5. Optimization
+    println!("Running VQE pseudo-gradient optimization over topological braid words...");
+    let (optimized_thetas, final_energy) = solver.optimize(&ansatz, &initial_thetas, 10).unwrap();
 
     println!();
     println!("Optimization Complete!");

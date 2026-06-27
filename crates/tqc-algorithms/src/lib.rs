@@ -18,27 +18,36 @@ pub struct Ansatz {
 
 impl Ansatz {
     /// Generates the circuit given a set of parameters (theta).
-    pub fn build_circuit(&self, thetas: &[f64]) -> Vec<LogicGate> {
+    ///
+    /// # Errors
+    /// Returns an error if the number of parameters provided does not match the
+    /// expected parameter count for the ansatz structure (2 * qubits * layers).
+    pub fn build_circuit(&self, thetas: &[f64]) -> Result<Vec<LogicGate>, String> {
+        let expected_params = 2 * self.num_qubits * self.layers;
+        if thetas.len() != expected_params {
+            return Err(format!(
+                "Ansatz expected {} parameters, but received {}",
+                expected_params,
+                thetas.len()
+            ));
+        }
+
         let mut circuit = Vec::new();
         let mut param_idx = 0;
 
         for _ in 0..self.layers {
             for q in 0..self.num_qubits {
-                if param_idx < thetas.len() {
-                    circuit.push(LogicGate::Ry(q, thetas[param_idx]));
-                    param_idx += 1;
-                }
-                if param_idx < thetas.len() {
-                    circuit.push(LogicGate::Rz(q, thetas[param_idx]));
-                    param_idx += 1;
-                }
+                circuit.push(LogicGate::Ry(q, thetas[param_idx]));
+                param_idx += 1;
+                circuit.push(LogicGate::Rz(q, thetas[param_idx]));
+                param_idx += 1;
             }
             // Entangling layer
             for q in 0..(self.num_qubits.saturating_sub(1)) {
                 circuit.push(LogicGate::CNot(q, q + 1));
             }
         }
-        circuit
+        Ok(circuit)
     }
 }
 
@@ -58,13 +67,16 @@ impl<'a> VqeSolver<'a> {
     }
 
     /// Evaluates the objective function (energy) for a set of parameters.
-    pub fn evaluate_energy(&self, ansatz: &Ansatz, thetas: &[f64]) -> f64 {
+    ///
+    /// # Errors
+    /// Returns an error if the ansatz cannot be compiled or parameters are mismatched.
+    pub fn evaluate_energy(&self, ansatz: &Ansatz, thetas: &[f64]) -> Result<f64, String> {
         // 1. Classical parameterized generation
-        let circuit = ansatz.build_circuit(thetas);
+        let circuit = ansatz.build_circuit(thetas)?;
 
         // 2. Classical-to-Topological Compilation
         let compiler = Compiler::new(self.params);
-        let word = compiler.compile(&circuit);
+        let word = compiler.compile(&circuit)?;
 
         // 3. Topological Execution
         let mut perm = Permutation::identity(self.params.class_count());
@@ -91,22 +103,25 @@ impl<'a> VqeSolver<'a> {
             .map(|(i, &v)| (i as f64) * (v as f64).powi(2))
             .sum();
 
-        energy
+        Ok(energy)
     }
 
     /// Runs a gradient-free parameter shift optimization.
+    ///
+    /// # Errors
+    /// Returns an error if evaluation fails during the loop.
     pub fn optimize(
         &self,
         ansatz: &Ansatz,
         initial_thetas: &[f64],
         iterations: usize,
-    ) -> (Vec<f64>, f64) {
+    ) -> Result<(Vec<f64>, f64), String> {
         let mut thetas = initial_thetas.to_vec();
         let mut best_energy = f64::MAX;
         let step = 0.1;
 
         for _ in 0..iterations {
-            let mut current_energy = self.evaluate_energy(ansatz, &thetas);
+            let mut current_energy = self.evaluate_energy(ansatz, &thetas)?;
             if current_energy < best_energy {
                 best_energy = current_energy;
             }
@@ -115,10 +130,10 @@ impl<'a> VqeSolver<'a> {
             for i in 0..thetas.len() {
                 let old = thetas[i];
                 thetas[i] = old + step;
-                let e_plus = self.evaluate_energy(ansatz, &thetas);
+                let e_plus = self.evaluate_energy(ansatz, &thetas)?;
 
                 thetas[i] = old - step;
-                let e_minus = self.evaluate_energy(ansatz, &thetas);
+                let e_minus = self.evaluate_energy(ansatz, &thetas)?;
 
                 if e_plus < current_energy && e_plus < e_minus {
                     thetas[i] = old + step;
@@ -131,6 +146,6 @@ impl<'a> VqeSolver<'a> {
                 }
             }
         }
-        (thetas, best_energy)
+        Ok((thetas, best_energy))
     }
 }
