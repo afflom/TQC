@@ -22,6 +22,7 @@ edition = "2021"
 rust-version = "1.83"
 license = "MIT"
 repository = "https://github.com/afflom/TQC"
+description = "A parametric, BDD-driven, V&V-gated realization of the Holospaces Universal Topological Quantum Computer (UTQC) — the topological structure carried by the UOR Atlas."
 authors = ["Alex Flom <alex@uor.foundation>"]
 
 # DRY: one place to pin every shared dependency.

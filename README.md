@@ -1,7 +1,7 @@
 # TQC
 
-A **parametric, BDD-driven, V&V-gated** realization of the Holospaces Topological
-Quantum Computer (TQC) — the topological-quantum (anyonic / modular-tensor-category)
+A **parametric, BDD-driven, V&V-gated** realization of the Holospaces Universal Topological
+Quantum Computer (UTQC) — the topological-quantum (anyonic / modular-tensor-category)
 structure carried by the UOR Atlas, run on the [holospaces] substrate.
 
 > TQC here means the **structural / simulation** sense — a modular-tensor-category (MTC)
