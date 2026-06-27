@@ -3,6 +3,7 @@
 //! Synthesizes arbitrary linear sequences of classical quantum gates (H, X, CNOT, T)
 //! into equivalent topological Braid Words running natively over the Atlas class space.
 
+pub mod qasm;
 pub mod sk;
 
 use sk::SkWeaver;
