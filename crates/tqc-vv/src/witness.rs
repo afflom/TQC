@@ -402,10 +402,7 @@ pub fn complex_amplitude_encoding(p: &UseCaseParams, f1: &F1Constants) -> Witnes
         .map(|i| {
             let re = f1.spectrum.eigenvalues[(i as usize) % f1.spectrum.eigenvalues.len()];
             let im = f1.modular.e4[(i as usize) % f1.modular.e4.len()];
-            (
-                i,
-                Amplitude { re, im },
-            )
+            (i, Amplitude { re, im })
         })
         .collect();
     let bytes = amplitude::encode(&state);
@@ -772,8 +769,7 @@ pub fn atlas_native_mtc(p: &tqc_core::UseCaseParams) -> Result<(), String> {
 /// Witness the quantum realization: unitarity and interference on the pointed braiding.
 #[allow(clippy::needless_range_loop)]
 pub fn quantum_realization(p: &UseCaseParams) -> Witness {
-    let native = tqc_mtc::native::construct_atlas_native(p)
-        .map_err(|e| format!("{:?}", e))?;
+    let native = tqc_mtc::native::construct_atlas_native(p).map_err(|e| format!("{:?}", e))?;
     let s = native.s_matrix();
     let t_diag = native.t_diag();
     let dim = native.dim();
@@ -796,7 +792,9 @@ pub fn quantum_realization(p: &UseCaseParams) -> Witness {
         for j in 0..dim {
             let expected = if i == j { 1.0 } else { 0.0 };
             if (s_dag_s[i][j].re - expected).abs() > 1e-9 || s_dag_s[i][j].im.abs() > 1e-9 {
-                return Err(format!("Operator S is not unitary on C^{dim}: U^dagger U != I"));
+                return Err(format!(
+                    "Operator S is not unitary on C^{dim}: U^dagger U != I"
+                ));
             }
         }
     }
@@ -839,7 +837,9 @@ pub fn quantum_realization(p: &UseCaseParams) -> Witness {
     }
 
     if !found_interference {
-        return Err("No interference witnessed: evolution is indistinguishable from classical prob".into());
+        return Err(
+            "No interference witnessed: evolution is indistinguishable from classical prob".into(),
+        );
     }
 
     Ok(())
