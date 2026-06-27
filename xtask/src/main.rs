@@ -193,6 +193,10 @@ fn run_suite_witness(
         "modular-s-t" => witness::modular_s_t(p),
         "braiding-r-matrix" => witness::braiding_r_matrix(p),
         "holospace-cycle" => witness::holospace_cycle(p),
+        "atlas-native-mtc" => witness::atlas_native_mtc(p),
+        "advantage" => witness::advantage_probe(p).map(|_| ()),
+        "finite-closure" => witness::finite_closure_probe(p).map(|_| ()),
+        "universality" => witness::equivalency_universality_probe(p),
         _ => return None,
     })
 }

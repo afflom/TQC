@@ -764,6 +764,12 @@ pub fn advantage_probe(p: &UseCaseParams) -> Result<ParetoMetrics, String> {
     })
 }
 
+/// Witness that the Atlas-native MTC construction successfully resolves topological obstructions.
+pub fn atlas_native_mtc(p: &tqc_core::UseCaseParams) -> Result<(), String> {
+    tqc_mtc::native::construct_atlas_native(p).map_err(|e| format!("{:?}", e))?;
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
