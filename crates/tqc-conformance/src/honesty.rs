@@ -74,8 +74,6 @@ pub fn audit(model: &Model, root: &Path) -> Result<AuditReport, String> {
         ));
     }
 
-
-
     // The inner product must be the positive-definite Euclidean composition norm.
     inner_product_is_euclidean(root)?;
 
@@ -114,8 +112,6 @@ fn collect_features(dir: &Path, root: &Path, out: &mut BTreeSet<String>) -> Resu
     }
     Ok(())
 }
-
-
 
 /// No Atlas composite literal may appear in `tqc-core` (the generic framework). The canonical
 /// numbers live only in `tqc-atlas` / the oracle. Comments and `#[cfg(test)]` modules are
