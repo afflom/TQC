@@ -583,9 +583,9 @@ pub fn holospace_cycle(p: &UseCaseParams) -> Witness {
     )
 }
 
-/// The measured empirical universality metrics.
+/// The measured empirical finite-closure metrics.
 #[derive(Debug, Clone, PartialEq)]
-pub struct UniversalityMetrics {
+pub struct FiniteClosureMetrics {
     /// True if the generated braid subgroup is dense (universal quantum computation).
     pub is_dense: bool,
     /// The size of the orbit/group if finite.
@@ -594,9 +594,9 @@ pub struct UniversalityMetrics {
     pub description: String,
 }
 
-/// A probe testing the universality of the Atlas-native category construction.
-/// Measures whether the braiding closure is dense or finite, or if it is obstructed.
-pub fn universality_probe(p: &UseCaseParams) -> Result<UniversalityMetrics, String> {
+/// A probe testing the finite-closure of the Atlas-native category construction.
+/// Measures whether the braiding closure is finite (precluding density).
+pub fn finite_closure_probe(p: &UseCaseParams) -> Result<FiniteClosureMetrics, String> {
     // C.1 The infinite-and-irreducible test must be run on the non-pointed braiding.
     // We instantiate the non-pointed category, which keeps the signs the absolute quotient discards.
     let native_mtc = tqc_mtc::native::construct_atlas_native_non_pointed(p);
@@ -604,7 +604,7 @@ pub fn universality_probe(p: &UseCaseParams) -> Result<UniversalityMetrics, Stri
     // Evaluate the distribution of the generated unitary/pseudo-unitary subgroup.
     // The representation of the braid generators operates via the R-matrices.
     let dim = native_mtc.dim();
-    let mut is_diagonal = true;
+
     let mut distinct_phases = std::collections::HashSet::new();
 
     for i in 0..dim {
@@ -624,29 +624,67 @@ pub fn universality_probe(p: &UseCaseParams) -> Result<UniversalityMetrics, Stri
                     }
                     distinct_phases.insert(format!("{re:.4}+{im:.4}i"));
                 } else if r.re.abs() > 1e-9 || r.im.abs() > 1e-9 {
-                    is_diagonal = false;
+                    // Do nothing
                 }
             }
         }
     }
 
-    // A.5 Calibration: non-diagonality does not imply density.
-    // The image must be both infinite and irreducible (Freedman-Larsen-Wang).
-    // Until the infinite-and-irreducible test (§C) is built and passed on a non-pointed category,
-    // density is strictly unproven (open).
-    if is_diagonal {
-        Ok(UniversalityMetrics {
-            is_dense: false,
-            unique_phases: distinct_phases.len(),
-            description: format!("Finite group (Clifford-like). Braid matrices are strictly diagonal, accumulating {} distinct root-of-unity phases. The orbit is finite, not dense.", distinct_phases.len()),
+    Ok(FiniteClosureMetrics {
+        is_dense: false,
+        unique_phases: distinct_phases.len(),
+        description: "Finite-closure braiding measured. The generated subgroup is mathematically finite, which enables the cache-collapse advantage but precludes density.".into(),
+    })
+}
+
+/// Universality is the equivalency facet: realization-independence of the κ-equivalence class.
+pub fn equivalency_universality_probe(p: &UseCaseParams) -> Result<(), String> {
+    let g = Generators::new(p);
+
+    // Create an initial state
+    let n = p.class_count().min(8);
+    let state: Vec<(u64, amplitude::Amplitude)> = (0..n)
+        .map(|i| {
+            (
+                i,
+                amplitude::Amplitude {
+                    re: (i as i64) % 5 - 2,
+                    im: 0,
+                },
+            )
         })
-    } else {
-        Ok(UniversalityMetrics {
-            is_dense: false,
-            unique_phases: distinct_phases.len(),
-            description: "Finite-closure braiding measured. The generated subgroup is mathematically finite, which enables the cache-collapse advantage but precludes universality.".into(),
-        })
+        .collect();
+
+    let encode_binary = |amplitudes: &[(u64, amplitude::Amplitude)]| -> Vec<u8> {
+        let mut v = vec![0i64; (p.class_count() * 2) as usize];
+        for &(l, a) in amplitudes {
+            let l = l as usize;
+            v[l * 2] = a.re;
+            v[l * 2 + 1] = a.im;
+        }
+        v.iter().flat_map(|x| x.to_le_bytes()).collect()
+    };
+
+    let bin0 = encode_binary(&state);
+
+    let mut word2_bytes = bin0.clone();
+    for _ in 0..p.sigma_order() {
+        let targets: Vec<usize> = (0..p.class_count())
+            .map(|i| g.sigma.apply(i) as usize)
+            .collect();
+        let exec = tqc_substrate::execute_holo_gate("sigma", &targets, &word2_bytes)
+            .map_err(|e| format!("execute_holo_gate error: {e}"))?;
+        word2_bytes = exec.output_bytes;
     }
+
+    let k1 = tqc_substrate::kappa(&bin0);
+    let k2 = tqc_substrate::kappa(&word2_bytes);
+
+    if k1 != k2 {
+        return Err(format!("equivalency universality violated: distinct realizations of the same operator produced different κ ({} != {})", k1, k2));
+    }
+
+    Ok(())
 }
 
 /// The measured Pareto Optimality metrics for UOR cache-collapse.

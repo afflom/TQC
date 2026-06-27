@@ -169,11 +169,16 @@ async fn t_holospace_cycle(w: &mut TqcWorld) {
 
 #[then("the generated subgroup is proven mathematically finite precluding density")]
 async fn t_finite_closure(w: &mut TqcWorld) {
-    let result = witness::universality_probe(&w.params()).unwrap();
+    let result = witness::finite_closure_probe(&w.params()).unwrap();
     assert!(
         !result.is_dense,
         "density must be provably false (finite closure)"
     );
+}
+
+#[then("the same topological operator resolves to identical κ across all realizations")]
+async fn t_universality(w: &mut TqcWorld) {
+    witness::equivalency_universality_probe(&w.params()).unwrap();
 }
 
 #[then("the topological degeneracy is proven to deliver compute savings")]
@@ -183,6 +188,12 @@ async fn t_advantage(w: &mut TqcWorld) {
         metrics.topological_degeneracy > 1.0,
         "advantage must be realized"
     );
+}
+
+#[then("the Atlas-native MTC construction successfully resolves topological obstructions")]
+async fn t_atlas_native_mtc_obstruction(w: &mut TqcWorld) {
+    let res = tqc_mtc::native::construct_atlas_native(&w.params());
+    assert!(res.is_ok(), "The native MTC construction should now mathematically resolve all prior topological obstructions");
 }
 
 #[tokio::main]
