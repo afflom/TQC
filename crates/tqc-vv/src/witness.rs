@@ -642,7 +642,7 @@ pub fn solovay_kitaev_probe(p: &UseCaseParams) -> Result<SolovayKitaevMetrics, S
         })
         .collect();
     phases.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
-    
+
     let mut epsilon = std::f64::consts::PI;
     if phases.len() > 1 {
         for i in 0..phases.len() - 1 {

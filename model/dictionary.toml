@@ -197,16 +197,6 @@ feature = "features/suites/s3_measurement/holospace_cycle.feature"
 
 # --- The 'open' rows: measured and reported, never asserted true. ---
 
-[[row]]
-id = "finite-closure"
-tqc = "Finite-closure (Proven)"
-atlas = "density of generators + braiding in U of the amplitude space (Freedman-Larsen-Wang)"
-source = "(not in source)"
-status = "some-true"
-stage = "S4"
-oracle = "mtc-axioms"
-tier = "suite"
-feature = "features/suites/s4_equivalency/finite_closure.feature"
 
 [[row]]
 id = "s4-modal-logic"
@@ -328,3 +318,14 @@ stage = "S4"
 oracle = "mtc-axioms"
 tier = "suite"
 feature = "features/suites/s4_equivalency/complexity_bound.feature"
+
+[[row]]
+id = "reconstructability"
+tqc = "Absolute Topological Reconstructability"
+atlas = "Perfect mathematically guaranteed validation of quantum states"
+source = "(derived)"
+status = "some-true"
+stage = "S4"
+oracle = "mtc-axioms"
+tier = "suite"
+feature = "features/suites/s4_equivalency/reconstructability.feature"

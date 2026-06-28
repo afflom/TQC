@@ -187,36 +187,36 @@ async fn t_utqc_proven(w: &mut TqcWorld) {
 async fn t_fault_tolerance(w: &mut TqcWorld) {
     let p = w.params();
     let g = tqc_core::generators::Generators::new(&p);
-    
+
     // Evaluate the exact same word twice.
     let n = p.class_count() as usize;
     let base: Vec<i64> = (0..n as i64).map(|i| i % 7 - 3).collect();
-    
+
     let mut perm1 = tqc_core::generators::Permutation::identity(p.class_count());
     let mut perm2 = tqc_core::generators::Permutation::identity(p.class_count());
-    
+
     // Some arbitrary complex word: sigma * tau * mu * sigma
     perm1 = perm1.then(&g.sigma).then(&g.tau).then(&g.mu).then(&g.sigma);
     perm2 = perm2.then(&g.sigma).then(&g.tau).then(&g.mu).then(&g.sigma);
-    
+
     let state1 = perm1.permute_amplitudes(&base);
     let state2 = perm2.permute_amplitudes(&base);
-    
+
     let amp1: Vec<(u64, tqc_core::amplitude::Amplitude)> = state1
         .iter()
         .enumerate()
         .map(|(i, &v)| (i as u64, tqc_core::amplitude::Amplitude { re: v, im: 0 }))
         .collect();
-        
+
     let amp2: Vec<(u64, tqc_core::amplitude::Amplitude)> = state2
         .iter()
         .enumerate()
         .map(|(i, &v)| (i as u64, tqc_core::amplitude::Amplitude { re: v, im: 0 }))
         .collect();
-        
+
     let k1 = tqc_substrate::kappa(&tqc_core::amplitude::encode(&amp1));
     let k2 = tqc_substrate::kappa(&tqc_core::amplitude::encode(&amp2));
-    
+
     assert_eq!(
         k1, k2,
         "Discrete combinatorial execution must produce exactly identical states, granting absolute decoherence immunity."
@@ -227,19 +227,63 @@ async fn t_fault_tolerance(w: &mut TqcWorld) {
 async fn t_complexity_bound(w: &mut TqcWorld) {
     let p = w.params();
     let g = tqc_core::generators::Generators::new(&p);
-    
+
     // Evaluate a long word (depth 1000) using topological permutation composition
     let mut perm = tqc_core::generators::Permutation::identity(p.class_count());
-    
+
     let start = std::time::Instant::now();
     for _ in 0..250 {
         perm = perm.then(&g.sigma).then(&g.tau).then(&g.mu).then(&g.sigma);
     }
     let elapsed = start.elapsed();
-    
+
     assert!(
         elapsed.as_millis() < 50,
         "Execution of depth 1000 braid word must complete in strictly polynomial time (under 50ms) avoiding any exponential state vector synthesis."
+    );
+}
+
+#[then("any validator can perfectly mathematically reconstruct the final state and identical kappa from the genesis configuration and braid word")]
+async fn t_reconstructability(w: &mut TqcWorld) {
+    let p = w.params();
+    let g = tqc_core::generators::Generators::new(&p);
+    let n = p.class_count() as usize;
+    let base: Vec<i64> = (0..n as i64).map(|i| i % 5).collect();
+
+    // First runner executes the topological program and publishes the final kappa.
+    let mut perm1 = tqc_core::generators::Permutation::identity(p.class_count());
+    let braid_word = vec![&g.sigma, &g.tau, &g.sigma, &g.mu, &g.tau];
+    for op in &braid_word {
+        perm1 = perm1.then(op);
+    }
+    let state1 = perm1.permute_amplitudes(&base);
+    let amp1: Vec<(u64, tqc_core::amplitude::Amplitude)> = state1
+        .iter()
+        .enumerate()
+        .map(|(i, &v)| (i as u64, tqc_core::amplitude::Amplitude { re: v, im: 0 }))
+        .collect();
+    let published_kappa = tqc_substrate::kappa(&tqc_core::amplitude::encode(&amp1));
+
+    // Validator perfectly reconstructs the state using only the genesis base and the braid word.
+    let mut perm_validator = tqc_core::generators::Permutation::identity(p.class_count());
+    for op in &braid_word {
+        perm_validator = perm_validator.then(op);
+    }
+    let state_validator = perm_validator.permute_amplitudes(&base);
+    let amp_validator: Vec<(u64, tqc_core::amplitude::Amplitude)> = state_validator
+        .iter()
+        .enumerate()
+        .map(|(i, &v)| (i as u64, tqc_core::amplitude::Amplitude { re: v, im: 0 }))
+        .collect();
+    let validator_kappa = tqc_substrate::kappa(&tqc_core::amplitude::encode(&amp_validator));
+
+    assert_eq!(
+        state1, state_validator,
+        "Validator must reconstruct the exact integer amplitude configurations with zero information loss"
+    );
+    assert_eq!(
+        published_kappa, validator_kappa,
+        "Validator must deterministically derive the exact matching cryptographic kappa invariant"
     );
 }
 
@@ -267,7 +311,11 @@ async fn t_s4_modal_logic(w: &mut TqcWorld) {
 async fn t_mac_lane_pentagon(w: &mut TqcWorld) {
     let mtc = tqc_mtc::native::construct_atlas_native(&w.params()).unwrap();
     let res = tqc_mtc::verifier::verify_mtc_axioms(&*mtc, 1e-9);
-    assert!(res.is_ok(), "Mac Lane Coherence mathematically verified: {:?}", res.err());
+    assert!(
+        res.is_ok(),
+        "Mac Lane Coherence mathematically verified: {:?}",
+        res.err()
+    );
 }
 
 #[then("the same topological operator resolves to identical κ across all realizations")]

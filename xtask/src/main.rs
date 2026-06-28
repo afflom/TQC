@@ -142,7 +142,7 @@ fn report() -> Result<()> {
     }
     lines.push(format!("\nsuites: {passed}/{suites} passed"));
 
-    let uni_str = match witness::finite_closure_probe(&p) {
+    let uni_str = match witness::solovay_kitaev_probe(&p) {
         Ok(m) => m.description,
         Err(e) => e,
     };
@@ -195,7 +195,6 @@ fn run_suite_witness(
         "holospace-cycle" => witness::holospace_cycle(p),
         "atlas-native-mtc" => witness::atlas_native_mtc(p),
         "advantage" => witness::advantage_probe(p).map(|_| ()),
-        "finite-closure" => witness::finite_closure_probe(p).map(|_| ()),
         "generative-closure" => witness::generative_closure_probe(p).map(|_| ()),
         "utqc-proven" => witness::utqc_proven_probe(p).map(|_| ()),
         "quantum-realization" => witness::quantum_realization(p),

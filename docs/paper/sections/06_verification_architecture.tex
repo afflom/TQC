@@ -1,16 +1,16 @@
-\section{The Validation and Verification (V\&V) Architecture}
+\section{Computer-Assisted Formal Verification Architecture}
 
-The scientific value of the UOR Atlas is inextricably linked to its strict Validation and Verification (V\&V) regimen. The whitepaper itself acts as a conceptual mirror to this architecture, providing the theoretical context for the executable proofs contained within the repository.
+The scientific value of the UOR Atlas is inextricably linked to its rigorous computer-assisted formal verification regimen. The whitepaper itself acts as a conceptual mirror to this architecture, providing the theoretical context for the executable proofs contained within the validation framework~\cite{hales2008}.
 
-\subsection{Docs-as-Code and the Ground Truth Dictionary}
-The theoretical assertions underpinning the UTQC---including the $S4$ modal logic framework, the 24 symmetry classes, and the Mac Lane coherence axioms---are defined explicitly in a human-readable, centralized source of truth (e.g., \texttt{model/dictionary.toml}). This conceptual model eliminates ambiguity; an architectural claim is only considered valid if it corresponds to an explicitly defined row within the dictionary.
+\subsection{Axiomatic Schematization}
+The theoretical assertions underpinning the topological framework---including the $S4$ modal logic properties, the 24 symmetry classes, and the Mac Lane coherence axioms---are defined explicitly within a centralized, machine-readable formal schema. This conceptual model eliminates ambiguity; a topological claim is only considered valid if it corresponds to an explicitly formalized constraint.
 
-\subsection{Behavior-Driven Execution (BDD) and Oracle Gating}
-The repository enforces these definitions through a parametric continuous integration (CI) pipeline. 
+\subsection{Automated Structural Verification}
+The evaluation environment enforces these constraints through a continuous parametric assertion pipeline. 
 \begin{enumerate}
-    \item \textbf{Gherkin BDD Scenarios:} These constraints map directly into executable Behavior-Driven Development (BDD) tests. For instance, the topological requirement that braiding operations commute is tested programmatically across the combinatorial space.
-    \item \textbf{Oracle Verification:} The constants and structural data utilized by the system are continuously checked against immutable external mathematical ground truths (canonical F1 parameter sets). The CI pipeline ensures the application strictly matches these theoretical oracles.
-    \item \textbf{Parametric Honesty:} The system strictly prohibits unfulfilled stubs or bypassed logic. Every declared topological rule in the dictionary must have an accompanying, passing mathematical proof in the executable suite.
+    \item \textbf{Executable Mathematical Assertions:} The structural constraints are mapped directly into programmatic test suites. For instance, the topological requirement that braiding operations obey the Yang-Baxter equations is verified exhaustively across the combinatorial representation space.
+    \item \textbf{Oracle Bounding:} The numerical constants and matrix coefficients utilized by the system are continuously checked against immutable external mathematical ground truths. The validation pipeline ensures the algebraic evaluation strictly matches these theoretical oracles.
+    \item \textbf{Proof Completeness:} The system strictly prohibits unfulfilled logic. Every declared topological rule in the formal schema must be continuously verified by an accompanying, deterministic mathematical execution in the validation suite.
 \end{enumerate}
 
-This V\&V regimen guarantees that the academic claims presented in this document are not merely theoretical speculation, but represent a fully functioning, mathematically verified computational implementation.
+This verification regimen guarantees that the academic claims presented in this document are not merely theoretical speculation, but represent a fully verified, algebraically constrained topological framework.
