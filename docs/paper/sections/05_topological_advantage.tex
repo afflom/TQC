@@ -6,10 +6,10 @@ In the UTQC, topological equivalency mathematically guarantees that disparate br
 
 The structural consequence is \textbf{UOR Cache-Collapse}. While evaluating finite-closure workloads, the combinatorial explosion of multi-path evaluations inevitably encounters topological degeneracy. Rather than diverging into an exponentially growing state-tree, the engine registers literal memory cache-hits against the pre-existing $\kappa$ address in the $A_\infty$ store. 
 
-Our empirical bounds (demonstrated natively in \texttt{1000\_qubit\_benchmark.rs} and \texttt{scaling\_benchmark.rs}) confirm this dynamic conclusively:
+Our empirical bounds (demonstrated natively in the\\ \texttt{1000\_qubit\_benchmark.rs} and \texttt{scaling\_benchmark.rs} workloads) confirm this dynamic conclusively:
 \begin{enumerate}
     \item \textbf{Exact $O(1)$ Memory Compression:} A 1,000-virtual-qubit classical simulation demands roughly $10^{290}$ terabytes of RAM---a quantity exceeding the atomic matter of the observable universe. In stark contrast, the UTQC models the equivalent topological entanglement with an absolute $O(1)$ memory footprint, structurally invariant and strictly bounded to a sub-kilobyte capacity dictated entirely by the topological carrier classes, not the qubit depth.
-    \item \textbf{Algorithmic Compute Elision (Speedup):} By merging equivalent topological branches into single cache references, the framework enacts a deterministic algorithmic short-circuit. Evaluation times scale solely as a function of distinct topological classes rather than operation depth, completely sidestepping the exponential complexity of un-collapsed path-integral summations.
+    \item \textbf{Algorithmic Compute Elision:} By merging equivalent topological branches into single cache references, the framework enacts a deterministic algorithmic short-circuit. Evaluation times scale solely as a function of distinct topological classes rather than operation depth, completely sidestepping the exponential complexity of un-collapsed path-integral summations.
 \end{enumerate}
 
 We definitively assert that the software UTQC, when executing finite-closure permutations, delivers exponential memory deduplication and topological compute acceleration that is fundamentally impossible to achieve on non-topological classical simulators. This is not merely an approximation; it is a proven structural collapse.
