@@ -18,7 +18,6 @@ The conceptual model formally defines the 24 symmetry classes ($\Omega = \{\omeg
 
 \subsection{Parametric Proof of Mac Lane Coherence}
 A central requirement of any braided monoidal category is adherence to the Mac Lane coherence theorem~\cite{maclane1963}, ensuring that the evaluation of tensor products is topologically invariant regardless of the sequence of associative or commutative operations. The Pentagon identity governing associativity:
-\begin{widetext}
 \begin{equation}
 \label{eq:pentagon}
 \begin{tikzcd}[column sep=large, row sep=large]
@@ -27,9 +26,7 @@ A central requirement of any braided monoidal category is adherence to the Mac L
 (A \otimes (B \otimes C)) \otimes D \arrow[r, "\alpha_{A,B\otimes C,D}"'] & A \otimes ((B \otimes C) \otimes D) \arrow[ur, "id_A \otimes \alpha_{B,C,D}"'] & 
 \end{tikzcd}
 \end{equation}
-\end{widetext}
 and the Hexagon identity governing commutativity (braiding):
-\begin{widetext}
 \begin{equation}
 \label{eq:hexagon}
 \begin{tikzcd}[column sep=large, row sep=large]
@@ -37,7 +34,6 @@ and the Hexagon identity governing commutativity (braiding):
 (B \otimes A) \otimes C \arrow[r, "\alpha_{B,A,C}"'] & B \otimes (A \otimes C) \arrow[r, "id_B \otimes \gamma_{A,C}"'] & B \otimes (C \otimes A)
 \end{tikzcd}
 \end{equation}
-\end{widetext}
 must be strictly satisfied. 
 
 In theoretical papers, these axioms are often assumed to hold for a proposed physical substrate. In the UOR Atlas, the proof is computational. The validation suite directly asserts Equations (\ref{eq:pentagon}) and (\ref{eq:hexagon}) as executable oracles across all permissible morphisms of the 24 classes. The computational verification framework executes these algebraic proofs over the combinatorial space, formally proving that the implemented operations form a valid braided monoidal category.

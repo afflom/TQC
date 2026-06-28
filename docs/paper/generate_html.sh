@@ -8,153 +8,113 @@ cat << 'EOF' > public/index.html
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UOR Atlas Whitepaper</title>
     <meta name="description" content="A Parametric, BDD-Driven, V&V-Gated Realization on Holospaces">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0b0f19;
-            --text-color: #e2e8f0;
-            --accent-color: #3b82f6;
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --bg-color: #ffffff;
+            --text-color: #222222;
+            --link-color: #0366d6;
+            --border-color: #eaecef;
         }
         
-        body, html {
+        body {
             margin: 0;
             padding: 0;
-            height: 100%;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(147, 51, 234, 0.15), transparent 25%);
-            background-attachment: fixed;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 2rem;
-            animation: fadeIn 1s ease-out;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            background: linear-gradient(to right, #60a5fa, #c084fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        p.subtitle {
-            font-size: 1.2rem;
-            color: #94a3b8;
-            max-width: 800px;
-            margin: 0 auto 2rem auto;
             line-height: 1.6;
         }
 
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 2rem;
-            width: 100%;
-            max-width: 1000px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex-grow: 1;
-            margin-bottom: 2rem;
-            animation: slideUp 0.8s ease-out;
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        header {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: normal;
+        }
+
+        .authors {
+            font-size: 1.2em;
+            font-style: italic;
+            color: #555;
+            margin-bottom: 5px;
         }
         
-        .pdf-container {
-            width: 100%;
-            flex-grow: 1;
-            min-height: 70vh;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid var(--glass-border);
-            background-color: #fff;
+        .affiliation {
+            font-size: 1em;
+            color: #777;
         }
-        
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+
+        .abstract {
+            background-color: #f6f8fa;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .abstract h2 {
+            margin-top: 0;
+            font-size: 1.2em;
+        }
+
+        .actions {
+            margin: 30px 0;
+            text-align: center;
         }
 
         .download-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            color: white;
+            display: inline-block;
+            background-color: var(--link-color);
+            color: #ffffff;
             text-decoration: none;
-            padding: 1rem 2rem;
-            border-radius: 9999px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.5);
-            margin-top: 1.5rem;
+            padding: 12px 24px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            border-radius: 4px;
+            font-size: 1.1em;
         }
-
+        
         .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.6);
-            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            background-color: #0056b3;
         }
 
-        .download-btn svg {
-            width: 24px;
-            height: 24px;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .pdf-viewer {
+            width: 100%;
+            height: 800px;
+            border: 1px solid var(--border-color);
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>The UOR Atlas as a Universal Topological Quantum Computer</h1>
-            <p class="subtitle">A Parametric, BDD-Driven, V&V-Gated Realization on Holospaces</p>
+            <h1>The UOR Atlas as a Universal Topological Quantum Computer: A Formal Categorical Realization on Holospaces</h1>
+            <div class="authors">The UOR Foundation</div>
+            <div class="affiliation">uor.foundation</div>
         </header>
 
-        <div class="glass-panel">
-            <div class="pdf-container">
-                <iframe src="UOR_Atlas_Whitepaper.pdf" title="UOR Atlas Whitepaper PDF"></iframe>
-            </div>
-            
-            <a href="UOR_Atlas_Whitepaper.pdf" download="UOR_Atlas_Whitepaper.pdf" class="download-btn">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                </svg>
-                Download PDF
-            </a>
+        <div class="abstract">
+            <h2>Abstract</h2>
+            <p>
+                This whitepaper formally details the realization of the Universal Topological Quantum Computer (UTQC) structured by the UOR Atlas. By leveraging the content-addressed <i>holospaces</i> substrate, the framework manifests topological-quantum modular tensor categories (MTC) computationally. We detail the resolution of three foundational mathematical obstructions&mdash;signed fusion constants, dimensionality mismatch, and indefinite spectral metrics&mdash;via structural absolute quotients, &#x2124;<sub>q</sub>-equivariant gauging, and pseudo-unitary metric relaxations. Furthermore, we report on the empirical demonstration of topological advantage via UOR cache-collapse, where the evaluation of finite-closure representations yields significant compute and memory deduplication Pareto efficiencies. All claims are guaranteed by rigorous computational proofs.
+            </p>
         </div>
+
+        <div class="actions">
+            <a href="UOR_Atlas_Whitepaper.pdf" class="download-btn">Download PDF Whitepaper</a>
+        </div>
+
+        <iframe src="UOR_Atlas_Whitepaper.pdf" class="pdf-viewer" title="UOR Atlas Whitepaper PDF"></iframe>
     </div>
 </body>
 </html>
