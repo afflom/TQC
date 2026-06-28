@@ -2,11 +2,22 @@
 
 To formally establish a UTQC, the underlying topological manifold must be rigorously defined. The UOR Atlas achieves this through a categorical mapping of state transitions into a non-pointed $S4$ modal logic structure, utilizing a predefined set of 24 invariant symmetry classes.
 
+\subsection{Braided Monoidal Categories}
+In category theory, a monoidal category consists of a category $\mathcal{C}$ equipped with a tensor product functor $\otimes: \mathcal{C} \times \mathcal{C} \rightarrow \mathcal{C}$, an identity object $I$, and natural isomorphisms defining associativity and unitality. A \textit{braided monoidal category} introduces a braiding isomorphism $\gamma_{A,B}: A \otimes B \xrightarrow{\sim} B \otimes A$ for all objects $A, B \in \mathcal{C}$, satisfying the hexagon identities~\cite{joyal1993}. In the context of TQC, the objects of $\mathcal{C}$ represent anyonic charges, the tensor product represents fusion, and the braiding isomorphism represents the physical exchange of anyons in two-dimensional space~\cite{wang2010}.
+
+\subsection{Non-Pointed S4 Modal Logic}
+The UOR Atlas departs from physical anyons by defining its fundamental objects through modal logic. Modal logic extends classical propositional logic with operators expressing modalities, such as necessity ($\Box$) and possibility ($\lozenge$)~\cite{blackburn2001}. The $S4$ system of modal logic is characterized by two axiom schemas applied to a frame $(W, R)$ consisting of a set of worlds $W$ and an accessibility relation $R$:
+\begin{enumerate}
+    \item \textbf{Reflexivity (Axiom T):} $\Box P \implies P$. For every world $w \in W$, $wRw$.
+    \item \textbf{Transitivity (Axiom 4):} $\Box P \implies \Box\Box P$. If $w_1Rw_2$ and $w_2Rw_3$, then $w_1Rw_3$.
+\end{enumerate}
+By the McKinsey-Tarski theorem~\cite{mckinsey1944}, $S4$ modal logic is sound and complete with respect to topological spaces, where $\Box$ corresponds to the topological interior operator and $\lozenge$ corresponds to the closure operator. The framework is \textit{non-pointed}, meaning the semantics are evaluated globally over open sets of the topology rather than at individual localized points (worlds), perfectly mirroring the non-local nature of topological quantum invariants.
+
 \subsection{Formalization of the 24 Symmetry Classes}
-The conceptual model (\texttt{docs/conceptual-model}) establishes the exact specifications of the 24 symmetry classes ($\Omega = \{\omega_1, \dots, \omega_{24}\}$). These classes serve as the computational analogues to non-abelian anyonic excitations. By encoding these classes within an $S4$ topological space---characterized by reflexivity and transitivity (idempotence) without requiring point-set specificity---the framework defines a finite Alexandroff topology. The morphisms between these classes constitute the fundamental logic gates of the system.
+The conceptual model (\texttt{docs/conceptual-model}) establishes the exact specifications of the 24 symmetry classes ($\Omega = \{\omega_1, \dots, \omega_{24}\}$). These classes form the objects of our monoidal category and serve as the computational analogues to non-abelian anyonic excitations. By encoding these classes within the non-pointed $S4$ topological space, the framework defines a finite Alexandroff topology~\cite{alexandroff1937}, where every point possesses a uniquely defined minimal neighborhood. The continuous morphisms between these classes constitute the fundamental logic gates of the system.
 
 \subsection{Parametric Proof of Mac Lane Coherence}
-A central requirement of any TQC architecture is adherence to the Mac Lane coherence theorem, ensuring that the evaluation of tensor products is topologically invariant. The Pentagon identity governing associativity:
+A central requirement of any braided monoidal category is adherence to the Mac Lane coherence theorem~\cite{maclane1963}, ensuring that the evaluation of tensor products is topologically invariant regardless of the sequence of associative or commutative operations. The Pentagon identity governing associativity:
 \begin{equation}
 \label{eq:pentagon}
     (\alpha_{A,B,C} \otimes id_D) \circ \alpha_{A,B\otimes C,D} \circ (id_A \otimes \alpha_{B,C,D}) = \alpha_{A\otimes B,C,D} \circ \alpha_{A,B,C\otimes D}
@@ -18,4 +29,4 @@ and the Hexagon identity governing commutativity (braiding):
 \end{equation}
 must be strictly satisfied. 
 
-In theoretical papers, these axioms are often assumed to hold for a proposed physical substrate. In this package, the proof is computational. The validation suite directly asserts Equations (\ref{eq:pentagon}) and (\ref{eq:hexagon}) as executable oracles across all permissible morphisms of the 24 classes. The repository's Continuous Integration (CI) gate executes these algebraic proofs over the combinatorial space, formally proving that the implemented operations form a valid braided monoidal category.
+In theoretical papers, these axioms are often assumed to hold for a proposed physical substrate. In the UOR Atlas, the proof is computational. The validation suite directly asserts Equations (\ref{eq:pentagon}) and (\ref{eq:hexagon}) as executable oracles across all permissible morphisms of the 24 classes. The repository's Continuous Integration (CI) gate executes these algebraic proofs over the combinatorial space, formally proving that the implemented operations form a valid braided monoidal category.

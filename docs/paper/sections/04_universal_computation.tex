@@ -1,7 +1,22 @@
 \section{Formal Verification of Universal Gate Sets}
 
-The transition from a coherent topological space to an operational quantum compiler involves the synthesis of a universal quantum gate set. Within the UOR Atlas, the foundational operations---braiding and fusion---are constructed via explicit modular $S$ and $T$ matrices modeled over the generalized quantum double $D(\mathbb{Z}_O)$.
+The transition from a coherent topological space to an operational quantum compiler involves the synthesis of a universal quantum gate set. Within the UOR Atlas, the foundational operations---braiding and fusion---are constructed via explicit modular $S$ and $T$ matrices modeled over the MTC framework.
 
-The mathematical validation infrastructure of this repository rigorously tests the structural properties of these matrices. The Behavior-Driven Development (BDD) suite programmatically asserts that the generated matrices strictly obey the required $SL(2, \mathbb{Z})$ invariants, namely $S^4 = I$, ${(ST)}^3 = S^2$, and the Verlinde normalization conditions.
+\subsection{The Modular \texorpdfstring{$S$}{S} and \texorpdfstring{$T$}{T} Matrices}
+The modular $S$-matrix defines the topological S-transformation (a $\pi/2$ rotation) and encodes the mutual braiding statistics of the anyon classes, as well as the quantum dimensions of the objects $d_a = S_{0a}/S_{00}$~\cite{rowell2009}. The $T$-matrix encodes the topological twists (the phase accumulated by an anyon undergoing a $2\pi$ self-rotation). Together, the $S$ and $T$ matrices generate a projective representation of the modular group $SL(2, \mathbb{Z})$.
 
-By anchoring the definitions of these matrices in the verifiable dictionary and continuously executing the associated unit tests, the framework provides an undeniable, reproducible proof that the topological gates formulated by the Atlas are mathematically sound and capable of supporting universal computation algorithms within the defined classical simulation bounds.
+The mathematical validation infrastructure of this repository rigorously tests the structural properties of these matrices. The Behavior-Driven Development (BDD) suite programmatically asserts that the generated matrices strictly obey the required algebraic invariants:
+\begin{align}
+    S^4 &= I \\
+    {(ST)}^3 &= S^2 \\
+    \sum_c N_{ab}^c S_{cx} &= \frac{S_{ax}S_{bx}}{S_{0x}} \quad (\text{Verlinde formula})
+\end{align}
+where $N_{ab}^c$ are the fusion coefficients~\cite{verlinde1988}.
+
+\subsection{The Braiding \texorpdfstring{$R$}{R}-Matrix and Yang-Baxter Equations}
+Multi-anyon entanglement is algebraically enacted via the Braiding $R$-Matrix, which maps the fusion channel of two objects into their braided fusion channel. For the topology to remain consistent, the $R$-matrix must satisfy the Yang-Baxter equation~\cite{jimbo1989}:
+\begin{equation}
+    (R \otimes I)(I \otimes R)(R \otimes I) = (I \otimes R)(R \otimes I)(I \otimes R)
+\end{equation}
+
+By anchoring the definitions of these matrices in the verifiable dictionary and continuously executing the associated unit tests, the framework provides an undeniable, reproducible proof that the topological gates formulated by the Atlas are mathematically sound. The validation suite confirms that the matrices fulfill the Yang-Baxter equation and $SL(2, \mathbb{Z})$ constraints identically, establishing the framework's capability to support universal computation algorithms within the defined classical simulation bounds.
