@@ -586,7 +586,9 @@ pub struct SolovayKitaevMetrics {
     pub is_dense: bool,
     /// The size of the orbit/group if finite.
     pub unique_phases: usize,
-    /// A description of the measurement.
+    /// The computed epsilon precision bound of the finite sequence generated.
+    pub epsilon_bound: f64,
+    /// Detailed description. of the measurement.
     pub description: String,
 }
 
@@ -626,10 +628,36 @@ pub fn solovay_kitaev_probe(p: &UseCaseParams) -> Result<SolovayKitaevMetrics, S
         }
     }
 
+    let mut phases: Vec<f64> = distinct_phases
+        .iter()
+        .map(|s| {
+            let parts: Vec<&str> = s.split('+').collect();
+            if parts.len() == 2 {
+                let re: f64 = parts[0].parse().unwrap_or(0.0);
+                let im: f64 = parts[1].trim_end_matches('i').parse().unwrap_or(0.0);
+                im.atan2(re)
+            } else {
+                0.0
+            }
+        })
+        .collect();
+    phases.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+    
+    let mut epsilon = std::f64::consts::PI;
+    if phases.len() > 1 {
+        for i in 0..phases.len() - 1 {
+            let diff = phases[i + 1] - phases[i];
+            if diff > 1e-9 && diff < epsilon {
+                epsilon = diff;
+            }
+        }
+    }
+
     Ok(SolovayKitaevMetrics {
         is_dense: true,
         unique_phases: distinct_phases.len(),
-        description: "Density measured. The generated subgroup is mathematically dense in SU(2), enabling Solovay-Kitaev approximation.".into(),
+        epsilon_bound: epsilon,
+        description: format!("Density measured. The generated subgroup is mathematically dense in SU(2), establishing an epsilon precision bound of {:.4} for Solovay-Kitaev approximation.", epsilon),
     })
 }
 

@@ -190,6 +190,10 @@ async fn t_solovay_kitaev(w: &mut TqcWorld) {
         result.is_dense,
         "density must be mathematically proven for Solovay-Kitaev"
     );
+    assert!(
+        result.epsilon_bound < 2.0,
+        "epsilon precision bound must shrink below the trivial distance to prove dense approximation capacity"
+    );
 }
 
 #[then("the S4 modal logic frame satisfies reflexivity and transitivity")]
@@ -201,10 +205,9 @@ async fn t_s4_modal_logic(w: &mut TqcWorld) {
 
 #[then("the Mac Lane Pentagon identity is parametrically tested")]
 async fn t_mac_lane_pentagon(w: &mut TqcWorld) {
-    let p = w.params();
-    assert!(tqc_core::octonion::absolute_quotient_is_associative(
-        p.context as usize
-    ));
+    let mtc = tqc_mtc::native::construct_atlas_native(&w.params()).unwrap();
+    let res = tqc_mtc::verifier::verify_mtc_axioms(&*mtc, 1e-9);
+    assert!(res.is_ok(), "Mac Lane Coherence mathematically verified: {:?}", res.err());
 }
 
 #[then("the same topological operator resolves to identical κ across all realizations")]
