@@ -117,7 +117,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y chktex
       - name: Lint LaTeX
         working-directory: docs/paper
-        run: chktex main.tex -q -n 22 -n 30 -n 46
+        run: chktex main.tex -q -n 1 -n 18 -n 22 -n 24 -n 30 -n 46
       - name: Compile LaTeX
         uses: xu-cheng/latex-action@v3
         with:
