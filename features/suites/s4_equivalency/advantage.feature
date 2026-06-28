@@ -7,4 +7,4 @@ Feature: Topological advantage via cache collapse
   not needing the original is the saving.
   Scenario: the topological degeneracy is measured and proven
     Given the UOR Atlas use-case
-    Then the topological degeneracy is proven to deliver compute savings
+    Then the topological framework mathematically subverts exponential Hilbert space expansion

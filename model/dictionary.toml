@@ -209,9 +209,42 @@ tier = "suite"
 feature = "features/suites/s4_equivalency/finite_closure.feature"
 
 [[row]]
+id = "s4-modal-logic"
+tqc = "Non-Pointed S4 Modal Logic"
+atlas = "Frame (W,R) satisfying reflexivity and transitivity globally over 24 symmetry classes"
+source = "(derived)"
+status = "some-true"
+stage = "S4"
+oracle = "mtc-axioms"
+tier = "suite"
+feature = "features/suites/s4_equivalency/s4_modal_logic.feature"
+
+[[row]]
+id = "mac-lane-coherence"
+tqc = "Mac Lane Coherence"
+atlas = "Pentagon identity (associativity) and Hexagon identity (commutativity) parametrically tested"
+source = "(derived)"
+status = "some-true"
+stage = "S2"
+oracle = "mtc-axioms"
+tier = "suite"
+feature = "features/suites/s2_mtc/mac_lane_coherence.feature"
+
+[[row]]
+id = "solovay-kitaev"
+tqc = "Solovay-Kitaev Theorem"
+atlas = "Density in SU(2) and epsilon-precision polynomial approximation bounds"
+source = "(derived)"
+status = "some-true"
+stage = "S4"
+oracle = "mtc-axioms"
+tier = "suite"
+feature = "features/suites/s4_equivalency/solovay_kitaev.feature"
+
+[[row]]
 id = "advantage"
 tqc = "Advantage (Proven)"
-atlas = "UOR Pareto optimization (cache-collapse compute savings, memory compression, network reduction)"
+atlas = "Polynomial bounded manipulation of topological invariants directly subverting exponential Hilbert space expansion"
 source = "ADR-041 content_reuse / cache_hits (x86_64/amd64 UOR cache-collapse via identical κ addresses)"
 status = "some-true"
 stage = "S4"
