@@ -383,6 +383,28 @@ async fn t_qft_algorithm(w: &mut TqcWorld) {
     );
 }
 
+#[then("a complex algorithmic rollup executes QPE with polynomial braid compilation")]
+async fn t_qpe_algorithm(w: &mut TqcWorld) {
+    let p = w.params();
+    let solver = tqc_algorithms::qpe::QpeSolver::new(3, 1);
+    let circuit = solver.build_circuit();
+    let compiler = tqc_compiler::Compiler::new(&p);
+
+    // The algorithmic rollup must successfully compile down to a topological braid word
+    let word = compiler
+        .compile(&circuit)
+        .expect("QPE circuit must compile");
+
+    assert!(
+        !word.sequence.is_empty(),
+        "The compiled topological braid word must not be empty"
+    );
+    assert!(
+        word.sequence.len() < 5000,
+        "The QPE compilation must remain bounded"
+    );
+}
+
 #[tokio::main]
 async fn main() {
     let features = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../features/suites");
