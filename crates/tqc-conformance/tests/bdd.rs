@@ -454,7 +454,9 @@ async fn t_topological_entanglement(w: &mut TqcWorld) {
 
 #[given(expr = "the whitepaper source in {string}")]
 async fn given_whitepaper_source(w: &mut TqcWorld, path: String) {
-    let content = std::fs::read_to_string(&path).expect("failed to read whitepaper source");
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../");
+    let full_path = root.join(&path);
+    let content = std::fs::read_to_string(&full_path).expect("failed to read whitepaper source");
     w.whitepaper_source = Some(content);
 }
 
