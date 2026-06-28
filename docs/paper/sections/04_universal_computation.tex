@@ -3,7 +3,9 @@
 The transition from a coherent topological space to an operational quantum compiler involves the synthesis of a universal quantum gate set. Within the UOR Atlas, the foundational operations---braiding and fusion---are constructed via explicit modular $S$ and $T$ matrices modeled over the MTC framework.
 
 \subsection{The Modular \texorpdfstring{$S$}{S} and \texorpdfstring{$T$}{T} Matrices}
-The modular $S$-matrix defines the topological S-transformation (a $\pi/2$ rotation) and encodes the mutual braiding statistics of the anyon classes, as well as the quantum dimensions of the objects $d_a = S_{0a}/S_{00}$~\cite{rowell2009}. The $T$-matrix encodes the topological twists (the phase accumulated by an anyon undergoing a $2\pi$ self-rotation). Together, the $S$ and $T$ matrices generate a projective representation of the modular group $SL(2, \mathbb{Z})$.
+In topological quantum computing, anyons are characterized by two fundamental behaviors: how they fuse together, and how they rotate around each other. These behaviors are mathematically captured by two matrices: the $S$-matrix and the $T$-matrix.
+
+The modular $S$-matrix defines the topological S-transformation (a $\pi/2$ spatial rotation) and encodes the mutual braiding statistics of the anyon classes—essentially describing what happens when one anyon loops completely around another. It also dictates the "quantum dimensions" of the objects $d_a = S_{0a}/S_{00}$~\cite{rowell2009}, which measures how rapidly the state space grows when many anyons are present. The $T$-matrix encodes the topological twists (the phase accumulated by an anyon undergoing a $2\pi$ self-rotation, like a particle spinning in place). Together, the $S$ and $T$ matrices generate a projective representation of the modular group $SL(2, \mathbb{Z})$.
 
 The formal validation infrastructure of this work rigorously tests the structural properties of these matrices. The computational suite programmatically asserts that the generated matrices strictly obey the required algebraic invariants:
 \begin{align}
@@ -14,7 +16,9 @@ The formal validation infrastructure of this work rigorously tests the structura
 where $N_{ab}^c$ are the fusion coefficients~\cite{verlinde1988}.
 
 \subsection{The Braiding \texorpdfstring{$R$}{R}-Matrix and Yang-Baxter Equations}
-Multi-anyon entanglement is algebraically enacted via the Braiding $R$-Matrix, which maps the fusion channel of two objects into their braided fusion channel. For the topology to remain consistent, the $R$-matrix must satisfy the Yang-Baxter equation~\cite{jimbo1989}:
+When two anyons are swapped in space, their physical positions are exchanged. Multi-anyon entanglement is algebraically enacted via the Braiding $R$-Matrix, which mathematically maps the fusion state of two objects into their newly braided state. 
+
+For a topological computer to function reliably, swapping anyons must be a consistent operation regardless of the order in which adjacent swaps occur. Think of three adjacent parallel threads: swapping the left two, then the right two, then the left two again should yield the exact same braided structure as swapping the right two, then the left two, then the right two. For the topology to remain consistent, the $R$-matrix must satisfy this precise geometrical constraint, known as the Yang-Baxter equation~\cite{jimbo1989}:
 \begin{equation}
     (R \otimes I)(I \otimes R)(R \otimes I) = (I \otimes R)(R \otimes I)(I \otimes R)
 \end{equation}
