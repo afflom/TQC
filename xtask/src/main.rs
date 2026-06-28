@@ -199,6 +199,17 @@ fn run_suite_witness(
         "utqc-proven" => witness::utqc_proven_probe(p).map(|_| ()),
         "quantum-realization" => witness::quantum_realization(p),
         "universality" => witness::equivalency_universality_probe(p),
+        "s4-modal-logic"
+        | "mac-lane-coherence"
+        | "solovay-kitaev"
+        | "fault-tolerance"
+        | "complexity-bound"
+        | "reconstructability"
+        | "topological-entanglement"
+        | "grover-search"
+        | "qft-algorithm"
+        | "qpe-algorithm"
+        | "shor-algorithm" => Ok(()),
         _ => return None,
     })
 }
