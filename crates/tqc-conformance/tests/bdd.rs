@@ -23,6 +23,7 @@ struct TqcWorld {
     model: Option<Model>,
     f1: Option<F1Constants>,
     params: Option<UseCaseParams>,
+    whitepaper_source: Option<String>,
 }
 
 impl TqcWorld {
@@ -448,5 +449,30 @@ async fn t_topological_entanglement(w: &mut TqcWorld) {
     assert!(
         result.is_logarithmic_scaling,
         "The entropy must scale logarithmically with braid depth, preventing chaotic thermalization"
+    );
+}
+
+#[given(expr = "the whitepaper source in {string}")]
+async fn given_whitepaper_source(w: &mut TqcWorld, path: String) {
+    let content = std::fs::read_to_string(&path).expect("failed to read whitepaper source");
+    w.whitepaper_source = Some(content);
+}
+
+#[then(expr = "it must use the {string} class")]
+async fn then_it_must_use_class(w: &mut TqcWorld, class: String) {
+    let content = w.whitepaper_source.as_ref().unwrap();
+    assert!(
+        content.contains(&class),
+        "Whitepaper does not use the required document class: {}",
+        class
+    );
+}
+
+#[then(expr = "it must include tikz diagrams for mathematical visual aids")]
+async fn then_it_must_include_tikz(w: &mut TqcWorld) {
+    let content = w.whitepaper_source.as_ref().unwrap();
+    assert!(
+        content.contains("\\usepackage{tikz}"),
+        "Whitepaper does not include tikz"
     );
 }

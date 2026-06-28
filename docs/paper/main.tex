@@ -1,4 +1,4 @@
-\documentclass[11pt, a4paper]{article}
+\documentclass[aps,pra,reprint,superscriptaddress,10pt,floatfix]{revtex4-2}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -6,15 +6,11 @@
 \usepackage{graphicx}
 \usepackage{tikz}
 \usepackage{tikz-cd}
-\usetikzlibrary{decorations.pathmorphing,shapes.geometric}
+\usetikzlibrary{decorations.pathmorphing,shapes.geometric,arrows.meta,positioning,calc}
 \usepackage{hyperref}
-\usepackage{geometry}
-\geometry{margin=1in}
-
 \usepackage{xcolor}
-\usepackage{fancyhdr}
 
-% UOR Foundation Branding Colors
+% UOR Foundation Branding Colors (can still be used for links)
 \definecolor{uorDark}{HTML}{0B1420}
 \definecolor{uorAccent}{HTML}{1A365D}
 
@@ -27,29 +23,19 @@
     pdftitle={The UOR Atlas as a Universal Topological Quantum Computer},
 }
 
-% Page styling (Headers and Footers)
-\pagestyle{fancy}
-\fancyhf{}
-\renewcommand{\headrulewidth}{0pt}
-\fancyfoot[L]{\color{uorDark}\small \href{https://uor.foundation}{uor.foundation}}
-\fancyfoot[C]{\color{uorDark}\small The UOR Foundation}
-\fancyfoot[R]{\color{uorDark}\small \thepage}
-
-\title{
-    \includegraphics[width=2.5cm]{assets/logo.png}\\[2ex]
-    \textcolor{uorDark}{\textbf{The UOR Atlas as a Universal Topological Quantum Computer}}\\
-    \large \textcolor{uorAccent}{A Parametric, BDD-Driven, V\&V-Gated Realization on Holospaces}
-}
-\author{\href{https://uor.foundation}{\textcolor{uorDark}{The UOR Foundation}}}
-\date{\today}
-
 \begin{document}
 
-\maketitle
+\title{The UOR Atlas as a Universal Topological Quantum Computer:\texorpdfstring{\\}{ } A Parametric, BDD-Driven, V\&V-Gated Realization on Holospaces}
+
+\author{The UOR Foundation}
+\affiliation{uor.foundation}
+\date{\today}
 
 \begin{abstract}
 This whitepaper formally details the realization of the Universal Topological Quantum Computer (UTQC) structured by the UOR Atlas. By leveraging the content-addressed \textit{holospaces} substrate, the framework manifests topological-quantum modular tensor categories (MTC) computationally. We detail the resolution of three foundational mathematical obstructions---signed fusion constants, dimensionality mismatch, and indefinite spectral metrics---via structural absolute quotients, $\mathbb{Z}_q$-equivariant gauging, and pseudo-unitary metric relaxations. Furthermore, we report on the empirical demonstration of topological advantage via UOR cache-collapse, where the evaluation of finite-closure representations yields significant compute and memory deduplication Pareto efficiencies. All claims are guaranteed by a rigorous docs-as-code verification and validation (V\&V) honesty architecture.
 \end{abstract}
+
+\maketitle
 
 \input{sections/01_introduction}
 \input{sections/02_topological_base}

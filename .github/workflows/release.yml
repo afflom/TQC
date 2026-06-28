@@ -19,7 +19,7 @@ jobs:
       - name: Install Pandoc and TeXLive
         run: |
           sudo apt-get update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra latexmk pandoc
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra texlive-publishers texlive-science latexmk pandoc
           
       - name: Compile PDF
         working-directory: docs/paper

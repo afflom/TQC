@@ -20,12 +20,19 @@ The conceptual model formally defines the 24 symmetry classes ($\Omega = \{\omeg
 A central requirement of any braided monoidal category is adherence to the Mac Lane coherence theorem~\cite{maclane1963}, ensuring that the evaluation of tensor products is topologically invariant regardless of the sequence of associative or commutative operations. The Pentagon identity governing associativity:
 \begin{equation}
 \label{eq:pentagon}
-    (\alpha_{A,B,C} \otimes id_D) \circ \alpha_{A,B\otimes C,D} \circ (id_A \otimes \alpha_{B,C,D}) = \alpha_{A\otimes B,C,D} \circ \alpha_{A,B,C\otimes D}
+\begin{tikzcd}[column sep=large, row sep=large]
+& (A \otimes B) \otimes (C \otimes D) \arrow[dr, "\alpha_{A\otimes B,C,D}"] & \\
+((A \otimes B) \otimes C) \otimes D \arrow[ur, "\alpha_{A,B,C} \otimes id_D"] \arrow[d, "\alpha_{A\otimes B,C,D}"'] & & A \otimes (B \otimes (C \otimes D)) \\
+(A \otimes (B \otimes C)) \otimes D \arrow[r, "\alpha_{A,B\otimes C,D}"'] & A \otimes ((B \otimes C) \otimes D) \arrow[ur, "id_A \otimes \alpha_{B,C,D}"'] & 
+\end{tikzcd}
 \end{equation}
 and the Hexagon identity governing commutativity (braiding):
 \begin{equation}
 \label{eq:hexagon}
-    \alpha_{B,C,A} \circ \gamma_{A,B\otimes C} \circ \alpha_{A,B,C} = (\gamma_{A,B} \otimes id_C) \circ \alpha_{B,A,C} \circ (id_B \otimes \gamma_{A,C})
+\begin{tikzcd}[column sep=large, row sep=large]
+(A \otimes B) \otimes C \arrow[r, "\alpha_{A,B,C}"] \arrow[d, "\gamma_{A,B} \otimes id_C"'] & A \otimes (B \otimes C) \arrow[r, "\gamma_{A,B\otimes C}"] & (B \otimes C) \otimes A \arrow[d, "\alpha_{B,C,A}"] \\
+(B \otimes A) \otimes C \arrow[r, "\alpha_{B,A,C}"'] & B \otimes (A \otimes C) \arrow[r, "id_B \otimes \gamma_{A,C}"'] & B \otimes (C \otimes A)
+\end{tikzcd}
 \end{equation}
 must be strictly satisfied. 
 
