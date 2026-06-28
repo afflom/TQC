@@ -7,6 +7,7 @@
 pub mod grover;
 pub mod qft;
 pub mod qpe;
+pub mod shor;
 
 use tqc_compiler::{BraidGen, Compiler, LogicGate};
 use tqc_core::generators::{Generators, Permutation};

@@ -405,6 +405,30 @@ async fn t_qpe_algorithm(w: &mut TqcWorld) {
     );
 }
 
+#[then(
+    "a complex algorithmic rollup executes Shor's period finding with polynomial braid compilation"
+)]
+async fn t_shor_algorithm(w: &mut TqcWorld) {
+    let p = w.params();
+    let solver = tqc_algorithms::shor::ShorSolver::new(4, 2);
+    let circuit = solver.build_circuit(2, 15);
+    let compiler = tqc_compiler::Compiler::new(&p);
+
+    // The algorithmic rollup must successfully compile down to a topological braid word
+    let word = compiler
+        .compile(&circuit)
+        .expect("Shor's circuit must compile");
+
+    assert!(
+        !word.sequence.is_empty(),
+        "The compiled topological braid word must not be empty"
+    );
+    assert!(
+        word.sequence.len() < 5000,
+        "The Shor's compilation must remain bounded"
+    );
+}
+
 #[tokio::main]
 async fn main() {
     let features = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../features/suites");
