@@ -142,7 +142,7 @@ fn report() -> Result<()> {
     }
     lines.push(format!("\nsuites: {passed}/{suites} passed"));
 
-    let uni_str = match witness::finite_closure_probe(&p) {
+    let uni_str = match witness::solovay_kitaev_probe(&p) {
         Ok(m) => m.description,
         Err(e) => e,
     };

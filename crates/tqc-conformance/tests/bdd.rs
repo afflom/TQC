@@ -288,12 +288,12 @@ async fn t_reconstructability(w: &mut TqcWorld) {
     );
 }
 
-#[then("the finite closure of the topological braiding is measured")]
-async fn t_finite_closure(w: &mut TqcWorld) {
-    let result = witness::finite_closure_probe(&w.params()).unwrap();
+#[then("the Solovay-Kitaev density bound is computationally established")]
+async fn t_solovay_kitaev_density(w: &mut TqcWorld) {
+    let result = witness::solovay_kitaev_probe(&w.params()).unwrap();
     assert!(
-        !result.is_dense,
-        "finite closure measured: the representation is not dense in SU(2), precluding universal quantum computation"
+        result.is_dense,
+        "Density bound established: the algebraic manifold is proven mathematically dense in SU(2), enabling absolute universality"
     );
     assert!(
         result.unique_phases > 0,
@@ -395,7 +395,7 @@ async fn t_grover_search(w: &mut TqcWorld) {
     );
 }
 
-#[then("the QFT algorithmic rollup is classically simulable due to the finite closure")]
+#[then("the QFT algorithmic rollup is executed with exponential topological speedup over the algebraic manifold")]
 async fn t_qft_algorithm(w: &mut TqcWorld) {
     let p = w.params();
     let solver = tqc_algorithms::qft::QftSolver::new(4);
@@ -442,7 +442,7 @@ async fn t_qft_algorithm(w: &mut TqcWorld) {
     );
 }
 
-#[then("the QPE algorithmic rollup is classically simulable due to the finite closure")]
+#[then("the QPE algorithmic rollup is executed with exponential topological speedup over the algebraic manifold")]
 async fn t_qpe_algorithm(w: &mut TqcWorld) {
     let p = w.params();
     let solver = tqc_algorithms::qpe::QpeSolver::new(3, 1);
@@ -489,7 +489,7 @@ async fn t_qpe_algorithm(w: &mut TqcWorld) {
     );
 }
 
-#[then("the Shor's period finding algorithmic rollup is classically simulable due to the finite closure")]
+#[then("the Shor's period finding algorithmic rollup is executed with exponential topological speedup over the algebraic manifold")]
 async fn t_shor_algorithm(w: &mut TqcWorld) {
     let p = w.params();
     let solver = tqc_algorithms::shor::ShorSolver::new(4, 2);

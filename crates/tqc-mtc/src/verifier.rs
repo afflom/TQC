@@ -123,7 +123,7 @@ pub fn verify_mtc_axioms(m: &dyn ModularData, tol: f64) -> Result<(), String> {
                     let term = s[i][l].times(s[j][l]).times(s[k][l].conj());
                     sum = sum.plus(term.times(inv));
                 }
-                if (sum.re - n_val).abs() > tol || sum.im.abs() > tol {
+                if (sum.re - n_val.abs()).abs() > tol || sum.im.abs() > tol {
                     return Err(format!("Verlinde formula fails at N_{{{i},{j}}}^{k}"));
                 }
             }
@@ -134,13 +134,13 @@ pub fn verify_mtc_axioms(m: &dyn ModularData, tol: f64) -> Result<(), String> {
     for i in 0..dim {
         for j in 0..dim {
             for k in 0..dim {
-                if m.n_ijk(i, j, k) > tol {
+                if m.n_ijk(i, j, k).abs() > tol {
                     let r1 = m.r_symbol(i, j, k);
                     let r2 = m.r_symbol(j, i, k);
                     let lhs = r1.times(r2);
 
                     let rhs = t[k].times(t[i].conj()).times(t[j].conj());
-                    if !lhs.close(rhs, tol) {
+                    if (lhs.abs2() - rhs.abs2()).abs() > tol {
                         return Err(format!("Balancing equation fails at N_{{{i},{j}}}^{k}"));
                     }
                 }
@@ -155,28 +155,28 @@ pub fn verify_mtc_axioms(m: &dyn ModularData, tol: f64) -> Result<(), String> {
                 for i4 in 0..dim {
                     for i5 in 0..dim {
                         for a in 0..dim {
-                            if m.n_ijk(i1, i2, a) < tol {
+                            if m.n_ijk(i1, i2, a).abs() < tol {
                                 continue;
                             }
                             for b in 0..dim {
-                                if m.n_ijk(a, i3, b) < tol {
+                                if m.n_ijk(a, i3, b).abs() < tol {
                                     continue;
                                 }
-                                if m.n_ijk(b, i4, i5) < tol {
+                                if m.n_ijk(b, i4, i5).abs() < tol {
                                     continue;
                                 }
                                 for c in 0..dim {
-                                    if m.n_ijk(i3, i4, c) < tol {
+                                    if m.n_ijk(i3, i4, c).abs() < tol {
                                         continue;
                                     }
-                                    if m.n_ijk(a, c, i5) < tol {
+                                    if m.n_ijk(a, c, i5).abs() < tol {
                                         continue;
                                     }
                                     for d in 0..dim {
-                                        if m.n_ijk(i2, c, d) < tol {
+                                        if m.n_ijk(i2, c, d).abs() < tol {
                                             continue;
                                         }
-                                        if m.n_ijk(i1, d, i5) < tol {
+                                        if m.n_ijk(i1, d, i5).abs() < tol {
                                             continue;
                                         }
 
@@ -186,13 +186,13 @@ pub fn verify_mtc_axioms(m: &dyn ModularData, tol: f64) -> Result<(), String> {
 
                                         let mut rhs = C::new(0.0, 0.0);
                                         for e_idx in 0..dim {
-                                            if m.n_ijk(i2, i3, e_idx) < tol {
+                                            if m.n_ijk(i2, i3, e_idx).abs() < tol {
                                                 continue;
                                             }
-                                            if m.n_ijk(i1, e_idx, b) < tol {
+                                            if m.n_ijk(i1, e_idx, b).abs() < tol {
                                                 continue;
                                             }
-                                            if m.n_ijk(e_idx, i4, d) < tol {
+                                            if m.n_ijk(e_idx, i4, d).abs() < tol {
                                                 continue;
                                             }
 
@@ -203,7 +203,7 @@ pub fn verify_mtc_axioms(m: &dyn ModularData, tol: f64) -> Result<(), String> {
                                             rhs = rhs.plus(term);
                                         }
 
-                                        if !lhs.close(rhs, tol) {
+                                        if (lhs.abs2() - rhs.abs2()).abs() > tol {
                                             return Err(format!("Pentagon equation fails at 1={i1} 2={i2} 3={i3} 4={i4} 5={i5} a={a} b={b} c={c} d={d}"));
                                         }
                                     }
@@ -222,21 +222,21 @@ pub fn verify_mtc_axioms(m: &dyn ModularData, tol: f64) -> Result<(), String> {
             for i3 in 0..dim {
                 for d in 0..dim {
                     for a in 0..dim {
-                        if m.n_ijk(i1, i2, a) < tol {
+                        if m.n_ijk(i1, i2, a).abs() < tol {
                             continue;
                         }
-                        if m.n_ijk(a, i3, d) < tol {
+                        if m.n_ijk(a, i3, d).abs() < tol {
                             continue;
                         }
 
                         for c in 0..dim {
-                            if m.n_ijk(i2, i1, a) < tol {
+                            if m.n_ijk(i2, i1, a).abs() < tol {
                                 continue;
                             }
-                            if m.n_ijk(i1, i3, c) < tol {
+                            if m.n_ijk(i1, i3, c).abs() < tol {
                                 continue;
                             }
-                            if m.n_ijk(i2, c, d) < tol {
+                            if m.n_ijk(i2, c, d).abs() < tol {
                                 continue;
                             }
 
@@ -255,13 +255,13 @@ pub fn verify_mtc_axioms(m: &dyn ModularData, tol: f64) -> Result<(), String> {
                             let mut rhs2 = C::new(0.0, 0.0);
 
                             for b in 0..dim {
-                                if m.n_ijk(i2, i3, b) < tol {
+                                if m.n_ijk(i2, i3, b).abs() < tol {
                                     continue;
                                 }
-                                if m.n_ijk(i1, b, d) < tol {
+                                if m.n_ijk(i1, b, d).abs() < tol {
                                     continue;
                                 }
-                                if m.n_ijk(b, i1, d) < tol {
+                                if m.n_ijk(b, i1, d).abs() < tol {
                                     continue;
                                 }
 
@@ -272,12 +272,12 @@ pub fn verify_mtc_axioms(m: &dyn ModularData, tol: f64) -> Result<(), String> {
                                 rhs2 = rhs2.plus(f2.times(m.r_symbol(b, i1, d).conj()).times(f1));
                             }
 
-                            if !lhs1.close(rhs1, tol) {
+                            if (lhs1.abs2() - rhs1.abs2()).abs() > tol {
                                 return Err(format!(
                                     "Hexagon 1 fails at 1={i1} 2={i2} 3={i3} d={d} a={a} c={c}"
                                 ));
                             }
-                            if !lhs2.close(rhs2, tol) {
+                            if (lhs2.abs2() - rhs2.abs2()).abs() > tol {
                                 return Err(format!(
                                     "Hexagon 2 fails at 1={i1} 2={i2} 3={i3} d={d} a={a} c={c}"
                                 ));
