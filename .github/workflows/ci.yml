@@ -118,4 +118,5 @@ jobs:
         with:
           root_file: docs/paper/main.tex
           working_directory: docs/paper/
+          args: -Werror -pdf -file-line-error -halt-on-error -interaction=nonstopmode
 
