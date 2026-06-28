@@ -24,11 +24,11 @@ This verification regimen guarantees that the academic claims presented in this 
 ]
     \node[box] (schema) {Formal Schema\\(\textit{e.g., $S4$ Axioms, Mac Lane Coherence})};
     \node[box, right=of schema] (engine) {Topological Verification Engine};
-    \node[box, right=of engine] (ci) {Automated CI Pipeline (Truth Oracle)};
+    \node[box, right=of engine] (ci) {Automated Computational Verification};
 
     \draw[arrow] (schema) -- (engine) node[midway, above] {Axioms};
     \draw[arrow] (engine) -- (ci) node[midway, above] {Proofs};
 \end{tikzpicture}
-\caption{The computer-assisted verification architecture. Mathematical axioms are translated into a formal schema, executed as programmatic tests via the topological engine, and rigorously verified against external ground truths by an automated CI pipeline.}
+\caption{The computer-assisted verification architecture. Mathematical axioms are translated into a formal schema, executed as programmatic tests via the topological engine, and rigorously verified against external ground truths by an automated computational pipeline.}
 \label{fig:verification}
 \end{figure}
