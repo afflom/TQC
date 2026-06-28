@@ -1472,6 +1472,7 @@ dependencies = [
  "tqc-core",
  "tqc-model",
  "tqc-mtc",
+ "tqc-substrate",
  "tqc-vv",
 ]
 
