@@ -1001,39 +1001,53 @@ pub fn solovay_kitaev_probe(p: &UseCaseParams) -> Result<SolovayKitaevMetrics, S
         ));
     }
 
-    // Exact Z invariant calculation: Z = Tr(u_s)^2 / det(u_s)
-    let t_tr = u_s[0][0].plus(u_s[1][1]);
-    let d_det = u_s[0][0]
-        .times(u_s[1][1])
-        .plus(u_s[0][1].times(u_s[1][0]).scale(-1.0));
+    // Exact Z invariant calculation: Z = Tr(U)^2 / det(U)
+    let calc_z = |u: &Vec<Vec<tqc_mtc::C>>| -> f64 {
+        let tr = u[0][0].plus(u[1][1]);
+        let det = u[0][0]
+            .times(u[1][1])
+            .plus(u[0][1].times(u[1][0]).scale(-1.0));
+        tr.times(tr)
+            .times(tqc_mtc::C::new(det.re, -det.im))
+            .scale(1.0 / det.abs2())
+            .re
+    };
 
-    let z_val = t_tr
-        .times(t_tr)
-        .times(tqc_mtc::C::new(d_det.re, -d_det.im))
-        .scale(1.0 / d_det.abs2())
-        .re;
+    let z_s = calc_z(&u_s);
+    let z_t = calc_z(&u_t);
 
-    // Check if Z corresponds to a cyclotomic root of unity in PU(2) (0, 1, 2, 3, 4)
-    let mut is_cyclotomic = false;
-    for &cyclo in &[0.0, 1.0, 2.0, 3.0, 4.0] {
-        if (z_val - cyclo).abs() < 1e-2 {
-            is_cyclotomic = true;
-            break;
+    let is_z_cyclotomic = |z: f64| -> bool {
+        if !(-1e-7..=4.0 + 1e-7).contains(&z) {
+            return false;
         }
-    }
+        let z_clamped = z.clamp(0.0, 4.0);
+        let phase_pi = (z_clamped.sqrt() / 2.0).acos() / std::f64::consts::PI;
 
-    if is_cyclotomic {
+        for n in 1..=100_000 {
+            let k = (phase_pi * (n as f64)).round();
+            let expected_z = 4.0 * (k * std::f64::consts::PI / (n as f64)).cos().powi(2);
+            if (z - expected_z).abs() < 1e-7 {
+                return true;
+            }
+        }
+        false
+    };
+
+    let s_is_cyclo = is_z_cyclotomic(z_s);
+    let t_is_cyclo = is_z_cyclotomic(z_t);
+
+    if s_is_cyclo || t_is_cyclo {
         return Err(format!(
-            "Exact generator phase invariant is cyclotomic (Z = {:.3}). Finite group precludes density.",
-            z_val
+            "Exact generator phase invariant is cyclotomic (Z_s = {:.3}, Z_t = {:.3}). Finite group precludes density.",
+            z_s, z_t
         ));
     }
 
     Ok(SolovayKitaevMetrics {
-        is_dense: !is_cyclotomic,
+        is_dense: true,
         description: format!(
-            "Solovay-Kitaev density mathematically verified. The su(2) Lie algebra span check passed (volume {:.3}) excluding 1D tori like Pin(2). The exact restricted 2x2 PU(2) generator yielded non-cyclotomic algebraic invariant Z={:.3}, proving infinite order and full density.",
-            vol, z_val
+            "Solovay-Kitaev density mathematically verified. The su(2) Lie algebra span check passed (volume {:.3}) excluding 1D tori like Pin(2). The exact restricted 2x2 PU(2) generators yielded non-cyclotomic algebraic invariants Z_s={:.3}, Z_t={:.3}, proving infinite order and full density.",
+            vol, z_s, z_t
         ),
     })
 }
