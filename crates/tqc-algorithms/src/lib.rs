@@ -96,7 +96,8 @@ impl<'a> VqeSolver<'a> {
 
         // Base ground state
         let n = self.params.class_count() as usize;
-        let base: Vec<i64> = (0..n as i64).map(|i| i % 3 - 1).collect();
+        let m = self.params.modality as i64;
+        let base: Vec<i64> = (0..n as i64).map(|i| i % m - (m / 2)).collect();
 
         // 4. State collapse and measurement
         let state = perm.permute_amplitudes(&base);

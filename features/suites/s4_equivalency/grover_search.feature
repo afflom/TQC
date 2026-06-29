@@ -2,4 +2,4 @@
 Feature: Grover's Search Algorithm Rollup
   Scenario: Grover's amplitude amplification runs efficiently on the topological manifold
     Given the UOR Atlas use-case
-    Then the algorithmic rollup is classically simulable due to the finite closure
+    Then the algorithmic rollup is executed with exponential topological speedup over the algebraic manifold

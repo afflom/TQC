@@ -25,38 +25,45 @@ pub struct SkWeaver {
 
 impl SkWeaver {
     /// Initializes a generic epsilon net covering the dense class space.
-    #[must_use]
-    pub fn new(is_dense: bool) -> Self {
+    pub fn new(is_dense: bool, p: &tqc_core::UseCaseParams) -> Self {
         // In a true implementation, this net is generated recursively via
         // Group Commutators of the primary Sigma, Tau, Mu generators.
-        // We synthesize a representative static epsilon net covering [0, 2PI].
+        // We synthesize a representative static epsilon net covering [0, 2PI] parametrically.
         let mut net = Vec::new();
 
         let pi = core::f64::consts::PI;
-        // Synthetic mapping: specific words generate specific fractional phase twists.
+
+        // Parametric synthetic mapping: words generate fractional phase twists based on generator orders.
+        // sigma order is p.scope, so rotation is 2pi / scope
+        let sigma_phase = 2.0 * pi / (p.scope as f64);
+        // tau order is p.context, so rotation is 2pi / context
+        let tau_phase = 2.0 * pi / (p.context as f64);
+        // mu order is 2, so rotation is pi
+        let mu_phase = pi;
+
         net.push(NetNode {
             word: vec![BraidGen::Sigma],
-            phase_angle: pi / 2.0,
+            phase_angle: sigma_phase,
         });
         net.push(NetNode {
             word: vec![BraidGen::Tau],
-            phase_angle: pi / 3.0,
+            phase_angle: tau_phase,
         });
         net.push(NetNode {
             word: vec![BraidGen::Sigma, BraidGen::Sigma],
-            phase_angle: pi,
+            phase_angle: sigma_phase * 2.0,
         });
         net.push(NetNode {
             word: vec![BraidGen::Tau, BraidGen::Tau],
-            phase_angle: 2.0 * pi / 3.0,
+            phase_angle: tau_phase * 2.0,
         });
         net.push(NetNode {
             word: vec![BraidGen::Sigma, BraidGen::Tau, BraidGen::Mu],
-            phase_angle: pi / 4.0,
+            phase_angle: sigma_phase + tau_phase + mu_phase,
         });
         net.push(NetNode {
             word: vec![BraidGen::Mu, BraidGen::Sigma, BraidGen::Tau],
-            phase_angle: pi / 8.0,
+            phase_angle: mu_phase + sigma_phase + tau_phase,
         });
 
         Self {
@@ -82,7 +89,9 @@ impl SkWeaver {
         // Until density is established, we only permit exact topological phases.
         if !self.is_dense {
             for node in &self.epsilon_net {
-                if (node.phase_angle - target).abs() < epsilon {
+                let diff = (node.phase_angle - target).abs();
+                let gap = diff.min(2.0 * core::f64::consts::PI - diff);
+                if gap < epsilon {
                     return Ok(node.word.clone());
                 }
             }
@@ -95,7 +104,9 @@ impl SkWeaver {
         // Greedy SK approximation
         for _ in 0..10 {
             // Max depth
-            if (current_phase - target).abs() < epsilon {
+            let diff = (current_phase - target).abs();
+            let gap = diff.min(2.0 * core::f64::consts::PI - diff);
+            if gap < epsilon {
                 return Ok(sequence);
             }
 
@@ -105,7 +116,8 @@ impl SkWeaver {
 
             for node in &self.epsilon_net {
                 let test_phase = (current_phase + node.phase_angle) % (2.0 * core::f64::consts::PI);
-                let gap = (test_phase - target).abs();
+                let diff = (test_phase - target).abs();
+                let gap = diff.min(2.0 * core::f64::consts::PI - diff);
                 if gap < best_gap {
                     best_gap = gap;
                     best_node = node;
@@ -116,20 +128,16 @@ impl SkWeaver {
             current_phase = (current_phase + best_node.phase_angle) % (2.0 * core::f64::consts::PI);
         }
 
-        if (current_phase - target).abs() < epsilon {
+        let final_diff = (current_phase - target).abs();
+        let final_gap = final_diff.min(2.0 * core::f64::consts::PI - final_diff);
+
+        if final_gap < epsilon {
             Ok(sequence)
         } else {
             Err(format!(
                 "SK Synthesis failed to converge within epsilon {} (residual gap: {})",
-                epsilon,
-                (current_phase - target).abs()
+                epsilon, final_gap
             ))
         }
-    }
-}
-
-impl Default for SkWeaver {
-    fn default() -> Self {
-        Self::new(false)
     }
 }

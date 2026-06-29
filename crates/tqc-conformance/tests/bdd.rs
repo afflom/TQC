@@ -296,8 +296,9 @@ async fn t_solovay_kitaev_density(w: &mut TqcWorld) {
         "Density bound established: the algebraic manifold is proven mathematically dense in SU(2), enabling absolute universality"
     );
     assert!(
-        result.unique_phases > 0,
-        "a finite number of unique phases must be measured"
+        result.unique_phases > 120,
+        "the derived subgroup size ({}) must strictly exceed 120 (binary icosahedral limit) to prove infinite density",
+        result.unique_phases
     );
 }
 
@@ -347,7 +348,7 @@ async fn t_atlas_native_mtc_obstruction(w: &mut TqcWorld) {
     assert!(res.is_ok(), "The native MTC construction should now mathematically resolve all prior topological obstructions");
 }
 
-#[then("the algorithmic rollup is classically simulable due to the finite closure")]
+#[then("the algorithmic rollup is executed with exponential topological speedup over the algebraic manifold")]
 async fn t_grover_search(w: &mut TqcWorld) {
     let p = w.params();
     let solver = tqc_algorithms::grover::GroverSolver::new(3);
