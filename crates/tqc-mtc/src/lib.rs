@@ -265,15 +265,15 @@ impl verifier::ModularData for DoubleZn {
             0.0
         }
     }
-    fn f_symbol(&self, _i: usize, _j: usize, _k: usize, _l: usize, m: usize, n: usize) -> C {
+    fn f_symbol(&self, i: usize, j: usize, k: usize, l: usize, m: usize, n: usize) -> C {
         // Pointed category with trivial 3-cocycle
         // F is a 1x1 identity matrix in the 1-dimensional space of valid channels.
         // For invalid channels, it's 0.
         // (i*j) = m, (m*k) = l, (j*k) = n, (i*n) = l.
-        if self.add_obj(_i, _j) == m
-            && self.add_obj(m, _k) == _l
-            && self.add_obj(_j, _k) == n
-            && self.add_obj(_i, n) == _l
+        if self.add_obj(i, j) == m
+            && self.add_obj(m, k) == l
+            && self.add_obj(j, k) == n
+            && self.add_obj(i, n) == l
         {
             C::new(1.0, 0.0)
         } else {

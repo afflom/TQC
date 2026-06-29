@@ -152,19 +152,19 @@ impl ModularData for AtlasNative {
         }
     }
 
-    fn f_symbol(&self, _i: usize, _j: usize, _k: usize, _l: usize, m: usize, n: usize) -> C {
-        let m1 = _i / self.context;
-        let c1 = _i % self.context;
-        let m2 = _j / self.context;
-        let c2 = _j % self.context;
-        let m3 = _k / self.context;
-        let c3 = _k % self.context;
+    fn f_symbol(&self, i: usize, j: usize, k: usize, l: usize, m: usize, n: usize) -> C {
+        let m1 = i / self.context;
+        let c1 = i % self.context;
+        let m2 = j / self.context;
+        let c2 = j % self.context;
+        let m3 = k / self.context;
+        let c3 = k % self.context;
         let m_m = m / self.context;
         let c_m = m % self.context;
         let m_n = n / self.context;
         let c_n = n % self.context;
-        let m_l = _l / self.context;
-        let c_l = _l % self.context;
+        let m_l = l / self.context;
+        let c_l = l % self.context;
 
         if (m1 + m2) % self.modality == m_m
             && c1 ^ c2 == c_m

@@ -61,6 +61,7 @@ panic = "deny"
 todo = "deny"
 unimplemented = "deny"
 dbg_macro = "deny"
+used_underscore_binding = "deny"
 
 [profile.release]
 overflow-checks = true
