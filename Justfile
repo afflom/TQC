@@ -4,6 +4,14 @@
 default:
     @just --list
 
+# --- Workflow Setup ---
+
+# Install the pre-push hook to enforce V&V before pushing
+install-hooks:
+    @echo '#!/bin/bash\n\necho "Running pre-push quality gates (just vv)..."\njust vv\n\nif [ $$? -ne 0 ]; then\n    echo "ERROR: V&V quality gates failed. Push rejected."\n    exit 1\nfi\n\necho "All gates passed! Proceeding with push."\nexit 0' > .git/hooks/pre-push
+    @chmod +x .git/hooks/pre-push
+    @echo "Pre-push hook installed successfully."
+
 # --- Quality gates (each is also a CI gate) ---
 
 # Format check (CI uses --check; locally `just fmt-fix` rewrites).
