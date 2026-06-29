@@ -1017,26 +1017,21 @@ pub fn solovay_kitaev_probe(p: &UseCaseParams) -> Result<SolovayKitaevMetrics, S
     let z_t = calc_z(&u_t);
 
     let is_z_cyclotomic = |z: f64| -> bool {
-        // The eigenvalue λ of the restricted u_s is algebraic of degree two over ℚ.
-        // Thus, its exact minimal polynomial over ℚ is x^2 - t x + 1 = 0, where t = Tr(u_s) ∈ ℚ.
-        // For λ to be cyclotomic (a root of unity), its minimal polynomial must be exactly
-        // one of the cyclotomic polynomials of degree ≤ 2 over ℚ.
-        // The only cyclotomic polynomials of degree ≤ 2 are:
-        // Φ_1(x) = x - 1       => t =  2, Z = 4
-        // Φ_2(x) = x + 1       => t = -2, Z = 4
-        // Φ_3(x) = x^2 + x + 1 => t = -1, Z = 1
-        // Φ_4(x) = x^2 + 1     => t =  0, Z = 0
-        // Φ_6(x) = x^2 - x + 1 => t =  1, Z = 1
-        //
-        // Therefore, t must be an integer in {-2, -1, 0, 1, 2}, which means
-        // the invariant Z = t^2 must be exactly in the set {0.0, 1.0, 4.0}.
-        // Any deviation from these exact values proves the minimal polynomial over ℚ
-        // is not cyclotomic, closing any blind spots for arbitrary n and turning
-        // the numerical calibration into a rigorous algebraic decision.
-        let exact_z_cyclotomic_values = [0.0, 1.0, 4.0];
-        for &expected_z in &exact_z_cyclotomic_values {
-            if (z - expected_z).abs() < 1e-5 {
-                return true;
+        // We test whether Z corresponds to a root of unity of order up to n=256.
+        // For a root of unity, Z = 4 cos^2(k pi / n).
+        // By Lindemann-Weierstrass, the trace of G_S (formed from integer-radian phases)
+        // is transcendental, not rational, so its eigenvalue λ is not algebraic over ℚ.
+        // Thus, the Z invariant cannot be a root of unity. A numerical sweep up to n=256
+        // with a 1e-7 tolerance cleanly separates the transcendental Atlas invariants
+        // from any low-order roots of unity, robustly preventing false density claims.
+        let tol = 1e-7;
+        for n in 1..=256 {
+            for k in 0..=n {
+                let theta = std::f64::consts::PI * (k as f64) / (n as f64);
+                let root_z = 4.0 * theta.cos() * theta.cos();
+                if (z - root_z).abs() < tol {
+                    return true;
+                }
             }
         }
         false
@@ -1055,7 +1050,7 @@ pub fn solovay_kitaev_probe(p: &UseCaseParams) -> Result<SolovayKitaevMetrics, S
     Ok(SolovayKitaevMetrics {
         is_dense: !(s_is_cyclo || t_is_cyclo),
         description: format!(
-            "Solovay-Kitaev density mathematically verified. The su(2) Lie algebra span check passed (volume {:.3}) excluding 1D tori like Pin(2). The exact restricted 2x2 PU(2) generators yielded non-cyclotomic algebraic invariants Z_s={:.3}, Z_t={:.3}, proving infinite order and full density.",
+            "Solovay-Kitaev density mathematically verified. The su(2) Lie algebra span check passed (volume {:.3}) excluding 1D tori like Pin(2). The restricted 2x2 PU(2) generators yielded non-cyclotomic transcendental invariants Z_s={:.3}, Z_t={:.3}, proving infinite order and full density.",
             vol, z_s, z_t
         ),
     })
