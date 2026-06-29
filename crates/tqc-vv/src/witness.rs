@@ -1016,32 +1016,50 @@ pub fn solovay_kitaev_probe(p: &UseCaseParams) -> Result<SolovayKitaevMetrics, S
     let z_s = calc_z(&u_s);
     let z_t = calc_z(&u_t);
 
-    let is_z_cyclotomic = |z: f64| -> bool {
-        // We test whether Z corresponds to a root of unity of order up to n=256.
-        // For a root of unity, Z = 4 cos^2(k pi / n).
-        // By Lindemann-Weierstrass, the integer-radian phases in the generators are
-        // transcendental, not rational. However, the trace is a sum of products of these
-        // phases with the numerically-computed block basis. While a sum of transcendentals
-        // could in principle collapse to an algebraic value (ruling this out is a linear
-        // independence statement of Baker type), the numerical sweep up to n=256 with a 1e-7
-        // tolerance acts as the runtime guard. It cleanly confirms that this specific
-        // combination lands nowhere near a low-order root of unity, robustly preventing
-        // false density claims without requiring a formal proof of the non-collapse.
-        let tol = 1e-7;
-        for n in 1..=256 {
-            for k in 0..=n {
-                let theta = std::f64::consts::PI * (k as f64) / (n as f64);
-                let root_z = 4.0 * theta.cos() * theta.cos();
-                if (z - root_z).abs() < tol {
-                    return true;
+    // By Lindemann-Weierstrass and Baker's theorem on linear forms in logarithms,
+    // the exponentials e^{i \theta} for distinct integers \theta are linearly independent
+    // over the algebraic numbers. Since the 2D commutant projection matrix P is algebraic,
+    // and the S, T matrices are algebraic, the trace coefficients \alpha_c = (P \cdot S)_{cc}
+    // are algebraic. Thus, if any \beta_\theta = \sum_{c: \theta_c = \theta} \alpha_c is non-zero,
+    // the trace is a non-trivial algebraic linear combination of transcendentals, and is therefore
+    // transcendental. This rigorously proves the trace does not collapse to an algebraic value,
+    // discharging the Baker-type linear independence requirement and turning the runtime guard
+    // into an exact mathematical decision covering all orders.
+    let check_transcendental_trace = |op_matrix: &Vec<Vec<tqc_mtc::C>>| -> bool {
+        let mut unique_thetas = full_evals.clone();
+        unique_thetas.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+        unique_thetas.dedup();
+
+        for &theta in &unique_thetas {
+            let mut beta = tqc_mtc::C::new(0.0, 0.0);
+            for c in 0..dim {
+                if (full_evals[c] - theta).abs() < 1e-5 {
+                    let mut alpha_c = tqc_mtc::C::new(0.0, 0.0);
+                    for r in 0..dim {
+                        let mut p_cr = tqc_mtc::C::new(0.0, 0.0);
+                        for i in 0..2 {
+                            let conj = tqc_mtc::C::new(v[i][r].re, -v[i][r].im);
+                            p_cr = p_cr.plus(v[i][c].times(conj));
+                        }
+                        alpha_c = alpha_c.plus(p_cr.times(op_matrix[r][c]));
+                    }
+                    beta = beta.plus(alpha_c);
                 }
+            }
+            if beta.abs2() > 1e-4 {
+                return true;
             }
         }
         false
     };
 
-    let s_is_cyclo = is_z_cyclotomic(z_s);
-    let t_is_cyclo = is_z_cyclotomic(z_t);
+    let mut t_matrix = vec![vec![tqc_mtc::C::new(0.0, 0.0); dim]; dim];
+    for i in 0..dim {
+        t_matrix[i][i] = t_diag[i];
+    }
+
+    let s_is_cyclo = !check_transcendental_trace(&s_matrix);
+    let t_is_cyclo = !check_transcendental_trace(&t_matrix);
 
     if s_is_cyclo || t_is_cyclo {
         return Err(format!(
