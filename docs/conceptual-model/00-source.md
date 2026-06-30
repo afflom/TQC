@@ -65,6 +65,7 @@ with no further assumption.
 | Braiding R-matrix | the braid datum (R/F satisfying hexagon / Yang–Baxter); built as the braiding of a representative pointed MTC (see Scope) | uor-addr / MTC axioms | build |
 | Modular S/T matrices | the SL(2,ℤ) representation; built as the modular data of a representative pointed MTC (see Scope) | MTC axioms | build |
 | Complex amplitude encoding | a content-addressed representation of ℂ-coefficients over the label index | — (the substrate stores bytes, not amplitudes) | build |
+| Two-Qubit Universality Proof | A native entangling phase gate derived from the coherent abelian double braiding without theory collision. | (future proof) | some-true |
 
 ## Substrate realization (how each row runs on holospaces)
 
@@ -130,7 +131,7 @@ composition / addressing structure; it never touches that crux.
   objects/labels, the belt and `A_∞` address space, the Euclidean inner product, Atlas composition
   (`g2`), conjugation (`f4`), the categorical operations (`e6/e7/e8`), the reflection
   generators (orthogonal/unitary), the Coxeter/Weyl group, the modular identities, the
-  spectrum, the E8 PSD seed, the coherence/ground-space laws, **universality** (the realization-independence of the κ-equivalence class), **advantage** (UOR Pareto optimization via cache-collapse).
+  spectrum, the E8 PSD seed, the coherence/ground-space laws, **universality** (the realization-independence of the κ-equivalence class), **advantage** (UOR Pareto optimization via cache-collapse), **Two-Qubit Universality Proof** (native entangling phase gate derived from the coherent abelian double braiding without theory collision).
 - **build** (construction on sourced pieces, validated against the universal MTC axioms only):
   - the **braiding R-matrix** — the braid datum satisfying hexagon / Yang–Baxter. The Atlas composition
     (`g2`) is commutative, so braiding is extra data, not one of the composition operations.

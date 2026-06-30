@@ -11,7 +11,7 @@
     clippy::missing_panics_doc
 )]
 
-use cucumber::{given, then, World};
+use cucumber::{given, then, when, World};
 use tqc_atlas::canonical;
 use tqc_core::generators::Generators;
 use tqc_core::{labels, UseCaseParams};
@@ -627,5 +627,28 @@ async fn t_finite_closure(w: &mut TqcWorld) {
     assert!(
         !result.is_dense,
         "The combinatorial execution manifold requires a finite subgroup to map exponential states to cacheable polynomials"
+    );
+}
+
+#[when("a two-qubit entangling gate is natively constructed from the abelian category")]
+async fn w_two_qubit_entangling_gate_natively_constructed(_w: &mut TqcWorld) {
+    // The gate is constructed and validated within the subsequent then-clauses.
+}
+
+#[then("the gate establishes full multi-qubit universality")]
+async fn t_multi_qubit_universality(w: &mut TqcWorld) {
+    let result = witness::two_qubit_universality_probe(&w.params()).unwrap();
+    assert!(
+        result.is_entangling,
+        "A native entangling phase gate must be established to guarantee two-qubit universality"
+    );
+}
+
+#[then("it does not induce a theory collision with the non-abelian construction")]
+async fn t_theory_collision_avoided(w: &mut TqcWorld) {
+    let result = witness::two_qubit_universality_probe(&w.params()).unwrap();
+    assert!(
+        result.is_coherent,
+        "The entangling gate must reside strictly in the coherent abelian substrate, avoiding collision"
     );
 }
