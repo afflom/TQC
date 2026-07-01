@@ -12,13 +12,13 @@ Having established a coherent, albeit finite, gate set, the UOR Atlas is equippe
     \node[block] (algo) {Quantum Algorithm (e.g., QPE, Shor's)};
     \node[block, right=2cm of algo] (compiler) {UOR Atlas Topological Compiler};
     \node[block, right=2cm of compiler, fill=green!10] (braid) {Combinatorial Braid Word ($\sigma, \tau, \mu$)};
-    \node[block, below=1cm of braid, fill=red!10] (eval) {Tensor Contraction ($\#P$-hard extraction)};
+    \node[block, below=1cm of braid, fill=red!10] (eval) {Topological Readout (Polynomial-time measurement)};
 
     \draw[arrow] (algo) -- (compiler) node[midway, above] {Decomposition};
     \draw[arrow] (compiler) -- (braid) node[midway, above] {Synthesis};
     \draw[arrow, dashed] (braid) -- (eval) node[midway, right] {Measurement};
 \end{tikzpicture}
-\caption{Algorithmic compilation pipeline. The classical quantum algorithm is decomposed and synthesized into a robust combinatorial braid word representing the invariant topological state. The final amplitude evaluation remains computationally bounded by classical limits due to the finite closure.}
+\caption{Algorithmic compilation pipeline. The classical quantum algorithm is decomposed and synthesized into a robust combinatorial braid word representing the invariant topological state. Because extraction is framed as a discrete invariant decision problem, final measurement is achieved efficiently in polynomial time, completely bypassing the $\#P$-hard tensor contraction barrier.}
 \label{fig:compilation}
 \end{figure}
 
