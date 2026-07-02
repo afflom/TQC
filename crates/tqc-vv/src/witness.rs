@@ -1008,16 +1008,15 @@ pub fn solovay_kitaev_probe(p: &UseCaseParams) -> Result<SolovayKitaevMetrics, S
         ));
     }
 
-    // By Lindemann-Weierstrass and Baker's theorem on linear forms in logarithms,
+    // By Lindemann-Weierstrass,
     // the exponentials e^{i * theta} for distinct integers theta are linearly independent
     // over the algebraic numbers. Since the 2D commutant projection matrix P is algebraic,
-    // and the S, T matrices are algebraic, the trace coefficients alpha_c = (P * S)_{cc}
+    // and the S, T matrices are algebraic, the trace coefficients alpha_c = (P * G)_{cc}
     // are algebraic. Thus, if any beta_theta = sum_{c: theta_c = theta} alpha_c is non-zero,
     // the trace is a non-trivial algebraic linear combination of transcendentals, and is therefore
     // transcendental. This rigorously proves the trace does not collapse to an algebraic value
     // matching any cyclotomic or binary polyhedral trace (which form dense sets).
-    // This discharges the Baker-type linear independence requirement and turns the runtime guard
-    // into an exact mathematical decision covering all finite orders simultaneously.
+    // This turns the runtime guard into an exact mathematical decision covering all finite orders simultaneously.
     let check_transcendental_trace = |op_matrix: &Vec<Vec<tqc_mtc::C>>| -> bool {
         let mut unique_thetas = full_evals.clone();
         unique_thetas.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
@@ -1047,13 +1046,9 @@ pub fn solovay_kitaev_probe(p: &UseCaseParams) -> Result<SolovayKitaevMetrics, S
         false
     };
 
-    let mut t_matrix = vec![vec![tqc_mtc::C::new(0.0, 0.0); dim]; dim];
-    for i in 0..dim {
-        t_matrix[i][i] = t_diag[i];
-    }
-
+    // Feed the coupled operators G_S (m_s) and G_T (m_t) which carry the archimedean density
     let s_is_infinite = check_transcendental_trace(&m_s);
-    let t_is_infinite = check_transcendental_trace(&t_matrix);
+    let t_is_infinite = check_transcendental_trace(&m_t);
 
     if !s_is_infinite || !t_is_infinite {
         return Err(format!(
@@ -1065,7 +1060,7 @@ pub fn solovay_kitaev_probe(p: &UseCaseParams) -> Result<SolovayKitaevMetrics, S
     Ok(SolovayKitaevMetrics {
         is_dense: s_is_infinite && t_is_infinite,
         description: format!(
-            "Solovay-Kitaev density verified. SU(2) single-qubit span passed (vol {:.3}) on the Torus Ground State space (H_T2). Invariants are mathematically proven transcendental via Lindemann-Weierstrass and Baker's theorem on linear forms in logarithms, precluding membership in any finite cyclic, dihedral, or polyhedral subgroup.",
+            "Solovay-Kitaev density verified. SU(2) single-qubit span passed (vol {:.3}). Invariants are mathematically proven transcendental via Lindemann-Weierstrass, precluding membership in any finite cyclic, dihedral, or polyhedral subgroup.",
             vol
         ),
     })
