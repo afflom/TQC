@@ -233,14 +233,25 @@ feature = "features/suites/s4_equivalency/finite_closure.feature"
 
 [[row]]
 id = "solovay-kitaev"
-tqc = "Solovay-Kitaev Approximation"
-atlas = "Approximation of SU(2) via discrete braid words"
+tqc = "Solovay-Kitaev Density (Decided)"
+atlas = "Exact decision over Q(zeta_24): the unique 2-dim commutant block is confined to the (-1) eigenspace, carries the finite projective Clifford image (exact order 24), and gate-density is refuted; universality is equivalency plus generative closure"
 source = "(derived)"
 status = "some-true"
 stage = "S4"
 oracle = "mtc-axioms"
 tier = "suite"
 feature = "features/suites/s4_equivalency/solovay_kitaev.feature"
+
+[[row]]
+id = "archimedean-continuity"
+tqc = "Archimedean Continuity (Located)"
+atlas = "On the 22-dim irreducible block the projective closure of the coupled generators is an infinite non-abelian compact group (adjoint-trace criterion plus a projectively non-commuting pair, exact over Q(zeta_24)): the machine exceeds every finite gate set, with the continuous content located on the block where the coupling is non-scalar"
+source = "(derived)"
+status = "some-true"
+stage = "S4"
+oracle = "mtc-axioms"
+tier = "suite"
+feature = "features/suites/s4_equivalency/archimedean_continuity.feature"
 
 [[row]]
 id = "advantage"
@@ -420,8 +431,8 @@ feature = "features/suites/s4_equivalency/whitepaper_formatting.feature"
 
 [[row]]
 id = "two-qubit-universality"
-tqc = "Two-Qubit Universality (Target)"
-atlas = "A native entangling gate derived from the coherent abelian construction without theory collision"
+tqc = "Native Two-Qubit Entangler (CZ)"
+atlas = "A native entangling gate derived from the coherent abelian construction without theory collision; no gate-set density claim (the exactly decided gate images are Clifford), universality carried by equivalency plus generative closure"
 source = "(future proof)"
 status = "some-true"
 stage = "S4"

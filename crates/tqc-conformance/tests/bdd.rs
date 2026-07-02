@@ -288,13 +288,20 @@ async fn t_reconstructability(w: &mut TqcWorld) {
     );
 }
 
-#[then("the Solovay-Kitaev density bound is computationally established")]
+#[then("the Solovay-Kitaev density question is exactly decided")]
 async fn t_solovay_kitaev_density(w: &mut TqcWorld) {
-    let result = witness::solovay_kitaev_probe(&w.params()).unwrap();
-    assert!(
-        result.is_dense,
-        "Density bound established: the algebraic manifold is proven mathematically dense in SU(2), enabling absolute universality"
-    );
+    // The decision, asserted as a theorem in both directions: unique 2-dim block, confined
+    // to the (-1) eigenspace, tr(P1 G_S) = 0 identically, finite projective Clifford image
+    // of exact order 24, density refuted. Decided over Q(zeta_24); no f64 in the verdict.
+    witness::solovay_kitaev_decision_witness(&w.params()).unwrap();
+}
+
+#[then("the archimedean continuity is exactly located on the 22-dim block")]
+async fn t_archimedean_continuity(w: &mut TqcWorld) {
+    // The positive half of the density decision: the coupled generators exceed every
+    // finite gate set, with the infinite non-abelian projective closure located on the
+    // 22-dim irreducible block. Decided over Q(zeta_24); no f64 in the verdict.
+    witness::archimedean_continuity_witness(&w.params()).unwrap();
 }
 
 #[then("the S4 modal logic frame satisfies reflexivity and transitivity")]
@@ -644,12 +651,12 @@ async fn w_two_qubit_entangling_gate_natively_constructed(_w: &mut TqcWorld) {
     // The gate is constructed and validated within the subsequent then-clauses.
 }
 
-#[then("the gate establishes full multi-qubit universality")]
+#[then("the native entangling gate is established without a gate-set density claim")]
 async fn t_multi_qubit_universality(w: &mut TqcWorld) {
     let result = witness::two_qubit_universality_probe(&w.params()).unwrap();
     assert!(
         result.is_entangling,
-        "A native entangling phase gate must be established to guarantee two-qubit universality"
+        "A native entangling phase gate must be established (no gate-set density is claimed)"
     );
 }
 

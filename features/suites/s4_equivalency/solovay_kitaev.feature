@@ -1,6 +1,6 @@
 @row:solovay-kitaev @stage:S4 @status:some-true @oracle:mtc-axioms
-Feature: Solovay-Kitaev Approximation
+Feature: Solovay-Kitaev Density (Decided)
   @row:solovay-kitaev
-  Scenario: the generated subgroup is measured and verified dense
+  Scenario: the density question is exactly decided over Q(zeta_24)
     Given the UOR Atlas use-case
-    Then the Solovay-Kitaev density bound is computationally established
+    Then the Solovay-Kitaev density question is exactly decided

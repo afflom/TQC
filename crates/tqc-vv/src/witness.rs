@@ -689,6 +689,26 @@ pub fn solovay_kitaev_probe(p: &UseCaseParams) -> Result<SolovayKitaevMetrics, S
     let native_mtc = tqc_mtc::native::construct_atlas_native(p).map_err(|e| e.to_string())?;
     let dim = native_mtc.dim();
 
+    // At the atlas use-case the density verdict is delegated to the exact algebraic
+    // certifier over Q(zeta_24) (crate::exact). The f64 machinery below is retained for
+    // non-atlas parameters only; its threshold-based non-collapse gate was refuted at the
+    // atlas by the exact computation (the unique 2-dim invariant block has tr(P1 G_S) = 0
+    // identically, lies inside the (-1) eigenspace where the coupling is a global phase,
+    // and carries a finite projective image).
+    if dim == 24 {
+        let report = crate::exact::exact_density_certificate(p)?;
+        if report.certified_dense {
+            return Ok(SolovayKitaevMetrics {
+                is_dense: true,
+                description: report.description,
+            });
+        }
+        return Err(format!(
+            "Exact algebraic certificate refutes single-qubit density on the 2-dim invariant block: {}",
+            report.description
+        ));
+    }
+
     let evals = tqc_core::spectrum::block_eigenvalues(p);
     let mults = if p.carrier_dim() == 24 {
         vec![1, 2, 7, 14]
@@ -1008,15 +1028,14 @@ pub fn solovay_kitaev_probe(p: &UseCaseParams) -> Result<SolovayKitaevMetrics, S
         ));
     }
 
-    // By Lindemann-Weierstrass,
-    // the exponentials e^{i * theta} for distinct integers theta are linearly independent
-    // over the algebraic numbers. Since the 2D commutant projection matrix P is algebraic,
-    // and the S, T matrices are algebraic, the trace coefficients alpha_c = (P * G)_{cc}
-    // are algebraic. Thus, if any beta_theta = sum_{c: theta_c = theta} alpha_c is non-zero,
-    // the trace is a non-trivial algebraic linear combination of transcendentals, and is therefore
-    // transcendental. This rigorously proves the trace does not collapse to an algebraic value
-    // matching any cyclotomic or binary polyhedral trace (which form dense sets).
-    // This turns the runtime guard into an exact mathematical decision covering all finite orders simultaneously.
+    // Heuristic non-collapse gate for NON-ATLAS parameters only (the atlas verdict is
+    // decided exactly in crate::exact, which refuted this gate's f64 threshold at dim 24:
+    // the true block coefficients are identically zero there). For distinct integer
+    // eigenvalues, e^{i theta} are linearly independent over the algebraic numbers
+    // (Lindemann-Weierstrass), so a genuinely nonzero algebraic coefficient combination
+    // makes the trace transcendental; this closure witnesses the nonzero-coefficient
+    // hypothesis numerically against a threshold. It is a runtime-level measurement, not
+    // an exact certificate: the numeric subspace and the threshold are both f64.
     let check_transcendental_trace = |op_matrix: &Vec<Vec<tqc_mtc::C>>| -> bool {
         let mut unique_thetas = full_evals.clone();
         unique_thetas.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
@@ -1046,7 +1065,8 @@ pub fn solovay_kitaev_probe(p: &UseCaseParams) -> Result<SolovayKitaevMetrics, S
         false
     };
 
-    // Feed the coupled operators G_S (m_s) and G_T (m_t) which carry the archimedean density
+    // Both generators are checked in their coupled form (bare T is finite-order and carries
+    // no transcendental phases, so a bare-T check would be vacuous).
     let s_is_infinite = check_transcendental_trace(&m_s);
     let t_is_infinite = check_transcendental_trace(&m_t);
 
@@ -1060,7 +1080,7 @@ pub fn solovay_kitaev_probe(p: &UseCaseParams) -> Result<SolovayKitaevMetrics, S
     Ok(SolovayKitaevMetrics {
         is_dense: s_is_infinite && t_is_infinite,
         description: format!(
-            "Solovay-Kitaev density verified. SU(2) single-qubit span passed (vol {:.3}). Invariants are mathematically proven transcendental via Lindemann-Weierstrass, precluding membership in any finite cyclic, dihedral, or polyhedral subgroup.",
+            "Runtime-level density heuristic (non-atlas parameters): SU(2) span check passed (vol {:.3}); trace coefficients witnessed numerically against a threshold, with transcendence of nontrivial combinations following from Lindemann-Weierstrass. This path is not an exact certificate; the atlas use-case is decided exactly in crate::exact.",
             vol
         ),
     })
@@ -1404,8 +1424,69 @@ pub fn two_qubit_universality_probe(
         is_entangling,
         // The gate is constructed strictly from the coherent native MTC, guaranteeing no collision.
         is_coherent: true,
-        description: "A two-qubit entangling phase gate (CZ-equivalent) was computed directly from the R-symbols of the coherent abelian Atlas native construction acting on logical flux assignments. This formally prevents theory collision and establishes absolute universality.".into(),
+        description: "A two-qubit entangling phase gate (CZ-equivalent) was computed directly from the R-symbols of the coherent abelian Atlas native construction acting on logical flux assignments, with no theory collision. No gate-set density claim is attached: the exactly decided single-qubit image is the finite projective Clifford group and CZ is Clifford, so the two-qubit gate-set image is finite; universality is carried by equivalency plus generative closure.".into(),
     })
+}
+
+/// The Solovay-Kitaev density question, exactly decided over `Q(zeta_24)`.
+///
+/// This witness asserts the DECISION as a theorem, in both directions, with no false green:
+/// the unique 2-dim commutant block exists (commutant dim exactly 2, `tr P1 = 2`), is confined
+/// to the `(-1)` spectral eigenspace, has `tr(P1 G_S) = 0` identically, carries the finite
+/// projective Clifford image of exact order 24, and density on the block is refuted. Any
+/// deviation from these exact facts is an error.
+pub fn solovay_kitaev_decision_witness(p: &UseCaseParams) -> Result<(), String> {
+    let r = crate::exact::exact_density_certificate(p)?;
+    if r.commutant_dim != 2 {
+        return Err(format!("commutant dim {} != 2", r.commutant_dim));
+    }
+    if r.block_dim != 2 {
+        return Err(format!("block dim {} != 2", r.block_dim));
+    }
+    if !r.beta_s_nonzero.is_empty() {
+        return Err(format!("tr(P1 G_S) not identically zero: {:?}", r.beta_s_nonzero));
+    }
+    let expected_support = vec![(10i64, 0.0f64), (7, 0.0), (2, 0.0), (-1, 2.0)];
+    if r.block_support != expected_support {
+        return Err(format!("block support {:?} != {:?}", r.block_support, expected_support));
+    }
+    if r.finite_image_order != Some(24) {
+        return Err(format!(
+            "projective image order {:?} != Some(24)",
+            r.finite_image_order
+        ));
+    }
+    if r.certified_dense {
+        return Err("density unexpectedly certified; the decision changed".into());
+    }
+    Ok(())
+}
+
+/// Archimedean continuity, exactly located: on the 22-dim irreducible block (support
+/// straddling all four eigenspaces) the projective closure of the coupled generators is an
+/// infinite non-abelian compact group. Certified by the adjoint-trace criterion (infinite
+/// projective order for the generator words) plus a projectively non-commuting pair, all
+/// decided over `Q(zeta_24)`. This is the exact theorem that the coupled machine exceeds
+/// every finite gate set: the beyond-Clifford content is on the 22-dim block, while the
+/// 2-dim block carries the finite projective Clifford image.
+pub fn archimedean_continuity_witness(p: &UseCaseParams) -> Result<(), String> {
+    let r = crate::exact::exact_density_certificate(p)?;
+    if r.commutant_dim != 2 {
+        return Err(format!("commutant dim {} != 2 (irreducibility premise)", r.commutant_dim));
+    }
+    if !r.block22_infinite.iter().any(|x| x == "T") || !r.block22_infinite.iter().any(|x| x == "S") {
+        return Err(format!(
+            "generator words not certified infinite projective order on the 22-dim block: {:?}",
+            r.block22_infinite
+        ));
+    }
+    if r.block22_pair.is_none() {
+        return Err("no projectively non-commuting pair on the 22-dim block".into());
+    }
+    if !r.beyond_finite {
+        return Err("beyond-finite certificate not established".into());
+    }
+    Ok(())
 }
 
 #[cfg(test)]
