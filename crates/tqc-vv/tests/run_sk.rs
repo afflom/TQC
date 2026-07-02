@@ -1,3 +1,4 @@
+//! Integration tests for running Solovay-Kitaev decision.
 use tqc_core::UseCaseParams;
 use tqc_vv::witness;
 #[test]

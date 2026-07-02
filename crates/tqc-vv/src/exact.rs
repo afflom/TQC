@@ -1,3 +1,5 @@
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::manual_memcpy)]
 //! Exact algebraic density certificate for the coupled Atlas generators.
 //!
 //! This module discharges the reviewer item: the non-collapse / nontriviality step of the
@@ -62,22 +64,27 @@ fn rz() -> BigRational {
 }
 
 impl Cyc {
+    /// The exact zero element of the cyclotomic field.
     pub fn zero() -> Self {
         Cyc { c: vec![rz(); DEG] }
     }
+    /// The exact one element of the cyclotomic field.
     pub fn one() -> Self {
         let mut v = Cyc::zero();
         v.c[0] = BigRational::one();
         v
     }
+    /// Conversion from an integer to a cyclotomic element.
     pub fn from_int(n: i64) -> Self {
         let mut v = Cyc::zero();
         v.c[0] = BigRational::from(BigInt::from(n));
         v
     }
+    /// Checks if the element is exactly zero.
     pub fn is_zero(&self) -> bool {
         self.c.iter().all(num_traits::Zero::is_zero)
     }
+    /// Addition in the cyclotomic field.
     pub fn add(&self, o: &Cyc) -> Cyc {
         let mut r = self.clone();
         for k in 0..DEG {
@@ -85,6 +92,7 @@ impl Cyc {
         }
         r
     }
+    /// Subtraction in the cyclotomic field.
     pub fn sub(&self, o: &Cyc) -> Cyc {
         let mut r = self.clone();
         for k in 0..DEG {
@@ -92,9 +100,11 @@ impl Cyc {
         }
         r
     }
+    /// Additive inverse in the cyclotomic field.
     pub fn neg(&self) -> Cyc {
         Cyc::zero().sub(self)
     }
+    /// Multiplication in the cyclotomic field.
     pub fn mul(&self, o: &Cyc) -> Cyc {
         // convolve to degree 14, then fold x^d = x^{d-4} - x^{d-8}
         let mut w = vec![rz(); 2 * DEG - 1];
@@ -117,7 +127,9 @@ impl Cyc {
             w[d - 4] += t.clone();
             w[d - 8] -= t;
         }
-        Cyc { c: w[..DEG].to_vec() }
+        Cyc {
+            c: w[..DEG].to_vec(),
+        }
     }
     /// `zeta_24^k` for any integer `k` (mod 24), exactly.
     pub fn zeta_pow(k: i64) -> Cyc {
@@ -132,7 +144,9 @@ impl Cyc {
             let t = std::mem::replace(&mut w[DEG], rz());
             w[4] += t.clone();
             w[0] -= t;
-            v = Cyc { c: w[..DEG].to_vec() };
+            v = Cyc {
+                c: w[..DEG].to_vec(),
+            };
         }
         v
     }
@@ -363,7 +377,9 @@ pub struct ExactDensityReport {
 /// Cross-checks the exact matrices against the runtime `tqc_mtc::native` construction
 /// entrywise before deciding anything.
 #[allow(clippy::too_many_lines)]
-pub fn exact_density_certificate(p: &tqc_core::UseCaseParams) -> Result<ExactDensityReport, String> {
+pub fn exact_density_certificate(
+    p: &tqc_core::UseCaseParams,
+) -> Result<ExactDensityReport, String> {
     let native = tqc_mtc::native::construct_atlas_native(p).map_err(|e| e.to_string())?;
     let dim = native.dim();
     let (modality, context) = (3usize, 8usize);
@@ -389,7 +405,9 @@ pub fn exact_density_certificate(p: &tqc_core::UseCaseParams) -> Result<ExactDen
             if (sre / root24 - s_num[i][j].re).abs() > 1e-9
                 || (sim / root24 - s_num[i][j].im).abs() > 1e-9
             {
-                return Err(format!("exact S~ disagrees with native s_matrix at ({i},{j})"));
+                return Err(format!(
+                    "exact S~ disagrees with native s_matrix at ({i},{j})"
+                ));
             }
         }
     }
@@ -664,7 +682,11 @@ pub fn exact_density_certificate(p: &tqc_core::UseCaseParams) -> Result<ExactDen
         // T diagonal: [C, T] entrywise
         for i in 0..dim {
             for j in 0..dim {
-                if !c_mat[i][j].mul(&t_diag[j]).sub(&t_diag[i].mul(&c_mat[i][j])).is_zero() {
+                if !c_mat[i][j]
+                    .mul(&t_diag[j])
+                    .sub(&t_diag[i].mul(&c_mat[i][j]))
+                    .is_zero()
+                {
                     return Err("[C, T] != 0".into());
                 }
             }
@@ -942,7 +964,11 @@ pub fn exact_density_certificate(p: &tqc_core::UseCaseParams) -> Result<ExactDen
             }
             frontier = next;
         }
-        if overflow { None } else { Some(elems.len()) }
+        if overflow {
+            None
+        } else {
+            Some(elems.len())
+        }
     };
     let coupling_note = if support_blocks == 1 {
         "the block is supported in a single spectral eigenspace, so E restricts to a \

@@ -142,7 +142,7 @@ fn report() -> Result<()> {
     }
     lines.push(format!("\nsuites: {passed}/{suites} passed"));
 
-    let uni_str = match witness::solovay_kitaev_probe(&p) {
+    let uni_str = match tqc_vv::exact::exact_density_certificate(&p) {
         Ok(m) => m.description,
         Err(e) => e,
     };
@@ -200,7 +200,8 @@ fn run_suite_witness(
         "quantum-realization" => witness::quantum_realization(p),
         "universality" => witness::equivalency_universality_probe(p),
         "two-qubit-universality" => witness::two_qubit_universality_probe(p).map(|_| ()),
-        "solovay-kitaev" => witness::solovay_kitaev_probe(p).map(|_| ()),
+        "solovay-kitaev" => witness::solovay_kitaev_decision_witness(p),
+        "archimedean-continuity" => witness::archimedean_continuity_witness(p),
         "finite-closure" => witness::finite_closure_probe(p).map(|_| ()),
         "whitepaper-formatting"
         | "s4-modal-logic"

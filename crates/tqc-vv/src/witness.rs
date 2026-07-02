@@ -895,12 +895,17 @@ pub fn solovay_kitaev_probe(p: &UseCaseParams) -> Result<SolovayKitaevMetrics, S
     }
 
     let mut p2d = vec![vec![tqc_mtc::C::new(0.0, 0.0); dim]; dim];
-    let coeff = (11.0 / 6.0_f64).sqrt();
+    let d_float = dim as f64;
+    // For a 2-dimensional target representation, the projector equation implies:
+    // P = coeff * B_2' + (2/D) I, where Tr(B_2'^2) = 1 and Tr(B_2') = 0.
+    // Taking the trace of P^2 = P gives coeff^2 = 2 - 4/D.
+    let coeff = (2.0 - 4.0 / d_float).sqrt();
+    let diag_shift = 2.0 / d_float;
     for i in 0..dim {
         for j in 0..dim {
             let mut val = b2_prime[i][j].scale(coeff);
             if i == j {
-                val.re += 1.0 / 12.0;
+                val.re += diag_shift;
             }
             p2d[i][j] = val;
         }
@@ -925,7 +930,7 @@ pub fn solovay_kitaev_probe(p: &UseCaseParams) -> Result<SolovayKitaevMetrics, S
             for j in 0..dim {
                 let mut val = b2_prime[i][j].scale(-coeff);
                 if i == j {
-                    val.re += 1.0 / 12.0;
+                    val.re += diag_shift;
                 }
                 p2d[i][j] = val;
             }
@@ -1444,11 +1449,17 @@ pub fn solovay_kitaev_decision_witness(p: &UseCaseParams) -> Result<(), String> 
         return Err(format!("block dim {} != 2", r.block_dim));
     }
     if !r.beta_s_nonzero.is_empty() {
-        return Err(format!("tr(P1 G_S) not identically zero: {:?}", r.beta_s_nonzero));
+        return Err(format!(
+            "tr(P1 G_S) not identically zero: {:?}",
+            r.beta_s_nonzero
+        ));
     }
     let expected_support = vec![(10i64, 0.0f64), (7, 0.0), (2, 0.0), (-1, 2.0)];
     if r.block_support != expected_support {
-        return Err(format!("block support {:?} != {:?}", r.block_support, expected_support));
+        return Err(format!(
+            "block support {:?} != {:?}",
+            r.block_support, expected_support
+        ));
     }
     if r.finite_image_order != Some(24) {
         return Err(format!(
@@ -1472,9 +1483,13 @@ pub fn solovay_kitaev_decision_witness(p: &UseCaseParams) -> Result<(), String> 
 pub fn archimedean_continuity_witness(p: &UseCaseParams) -> Result<(), String> {
     let r = crate::exact::exact_density_certificate(p)?;
     if r.commutant_dim != 2 {
-        return Err(format!("commutant dim {} != 2 (irreducibility premise)", r.commutant_dim));
+        return Err(format!(
+            "commutant dim {} != 2 (irreducibility premise)",
+            r.commutant_dim
+        ));
     }
-    if !r.block22_infinite.iter().any(|x| x == "T") || !r.block22_infinite.iter().any(|x| x == "S") {
+    if !r.block22_infinite.iter().any(|x| x == "T") || !r.block22_infinite.iter().any(|x| x == "S")
+    {
         return Err(format!(
             "generator words not certified infinite projective order on the 22-dim block: {:?}",
             r.block22_infinite
